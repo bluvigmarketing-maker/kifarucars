@@ -6,11 +6,11 @@ type Size = "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-burgundy-600 text-white hover:bg-burgundy-700 focus-visible:outline-burgundy-600",
+    "border-2 border-gold-400/70 shadow-[0_0_14px_-3px_rgba(201,162,39,0.55)] bg-burgundy-600 text-white hover:bg-burgundy-700 focus-visible:outline-burgundy-600",
   secondary:
-    "bg-charcoal-900 text-white hover:bg-charcoal-800 focus-visible:outline-charcoal-900",
+    "border-2 border-gold-400/70 shadow-[0_0_14px_-3px_rgba(201,162,39,0.55)] bg-charcoal-900 text-white hover:bg-charcoal-800 focus-visible:outline-charcoal-900",
   outline:
-    "border border-charcoal-300 text-charcoal-900 hover:border-burgundy-600 hover:text-burgundy-700 dark:border-charcoal-700 dark:text-charcoal-50 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400",
+    "border-2 border-gold-500/75 shadow-[0_0_14px_-3px_rgba(201,162,39,0.4)] text-charcoal-900 hover:border-burgundy-600 hover:text-burgundy-700 dark:border-gold-400/60 dark:text-charcoal-50 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400",
   ghost: "text-charcoal-900 hover:text-burgundy-700 dark:text-charcoal-50 dark:hover:text-burgundy-400",
 };
 

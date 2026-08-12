@@ -20,7 +20,7 @@ export function EnquiriesTable({ enquiries }: { enquiries: Enquiry[] }) {
   return (
     <div className="space-y-3">
       {enquiries.map((enquiry) => (
-        <div key={enquiry.id} className="rounded-2xl border border-charcoal-100 bg-white p-5 dark:border-charcoal-800 dark:bg-charcoal-900">
+        <div key={enquiry.id} className="rounded-2xl border border-gold-500/30 bg-white p-5 dark:border-gold-400/25 dark:bg-charcoal-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="font-medium text-charcoal-950 dark:text-white">

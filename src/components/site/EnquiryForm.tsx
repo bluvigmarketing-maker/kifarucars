@@ -10,7 +10,7 @@ import type { EnquiryFormState } from "@/lib/validations";
 const initialState: EnquiryFormState = { status: "idle" };
 
 const inputClasses =
-  "w-full rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-charcoal-400 focus:border-burgundy-400 focus:outline-none";
+  "w-full rounded-lg border border-gold-400/25 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-charcoal-400 focus:border-burgundy-400 focus:outline-none";
 
 export function EnquiryForm() {
   const [state, formAction, pending] = useActionState(submitEnquiry, initialState);

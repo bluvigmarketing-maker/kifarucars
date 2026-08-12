@@ -15,7 +15,7 @@ export default async function AdminLoginPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-charcoal-50 px-4 dark:bg-charcoal-950">
-      <div className="w-full max-w-sm rounded-2xl border border-charcoal-100 bg-white p-8 shadow-sm dark:border-charcoal-800 dark:bg-charcoal-900">
+      <div className="w-full max-w-sm rounded-2xl border border-gold-500/30 bg-white p-8 shadow-sm dark:border-gold-400/25 dark:bg-charcoal-900">
         <p className="font-display text-2xl text-charcoal-950 dark:text-white">Kifaru</p>
         <p className="mt-1 text-sm text-charcoal-500 dark:text-charcoal-400">Admin dashboard sign in</p>
 

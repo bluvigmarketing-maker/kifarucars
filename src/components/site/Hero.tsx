@@ -46,7 +46,7 @@ export function Hero() {
             <Button href="#enquiry" size="lg">
               Get A Quote
             </Button>
-            <Button href="#enquiry" variant="outline" size="lg" className="border-white/30 text-white hover:border-white hover:text-white">
+            <Button href="#enquiry" variant="outline" size="lg" className="border-gold-400/50 text-white hover:border-gold-300 hover:text-white">
               Request A Callback
             </Button>
           </div>

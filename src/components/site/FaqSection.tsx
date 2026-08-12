@@ -23,7 +23,7 @@ export function FaqSection() {
             </p>
           </div>
 
-          <div className="divide-y divide-charcoal-100 rounded-2xl border border-charcoal-100 dark:divide-charcoal-800 dark:border-charcoal-800">
+          <div className="divide-y divide-gold-500/20 rounded-2xl border border-gold-500/30 dark:divide-gold-400/15 dark:border-gold-400/25">
             {FAQS.map((faq, index) => {
               const isOpen = openIndex === index;
               return (

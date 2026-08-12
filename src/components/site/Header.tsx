@@ -24,7 +24,9 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-charcoal-100 bg-white/95 backdrop-blur dark:border-charcoal-800 dark:bg-charcoal-950/95">
       <Container className="flex h-18 items-center justify-between py-3">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/images/kifaru-icon.png" alt="" width={388} height={317} priority className="h-10 w-auto" />
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-gold-500/40 p-1.5 dark:border-gold-400/35">
+            <Image src="/images/kifaru-icon.png" alt="" width={388} height={317} priority className="h-full w-auto" />
+          </span>
           <span className="font-display text-2xl font-semibold text-charcoal-950 dark:text-white">
             Kifaru
           </span>

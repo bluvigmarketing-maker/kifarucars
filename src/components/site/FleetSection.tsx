@@ -1,20 +1,53 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VehicleCard } from "@/components/site/VehicleCard";
+import { cn } from "@/lib/cn";
 import type { Vehicle } from "@/lib/types";
 
 export function FleetSection({ vehicles }: { vehicles: Vehicle[] }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [activeSlide, setActiveSlide] = useState(0);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
-  const scrollBy = (dir: 1 | -1) => {
-    scrollerRef.current?.scrollBy({ left: dir * 340, behavior: "smooth" });
+  const slideTo = (index: number) => {
+    const scroller = scrollerRef.current;
+    const card = scroller?.children[index] as HTMLElement | undefined;
+    if (scroller && card) {
+      scroller.scrollTo({ left: card.offsetLeft, behavior: "smooth" });
+    }
   };
+
+  const step = (dir: 1 | -1) => {
+    slideTo(Math.min(Math.max(activeSlide + dir, 0), vehicles.length - 1));
+  };
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const onScroll = () => {
+      const cards = Array.from(scroller.children) as HTMLElement[];
+      const { scrollLeft } = scroller;
+      let closest = 0;
+      let closestDistance = Infinity;
+      cards.forEach((card, i) => {
+        const distance = Math.abs(card.offsetLeft - scrollLeft);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closest = i;
+        }
+      });
+      setActiveSlide(closest);
+    };
+
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => scroller.removeEventListener("scroll", onScroll);
+  }, [vehicles.length]);
 
   return (
     <section id="fleet" className="py-20 sm:py-24">
@@ -36,10 +69,10 @@ export function FleetSection({ vehicles }: { vehicles: Vehicle[] }) {
         <div className="relative mt-8">
           <div
             ref={scrollerRef}
-            className="flex gap-5 overflow-x-auto pb-2 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {vehicles.map((vehicle) => (
-              <div key={vehicle.id} className="w-[280px] flex-shrink-0 sm:w-[310px]">
+              <div key={vehicle.id} className="w-[280px] flex-shrink-0 snap-start sm:w-[310px]">
                 <VehicleCard vehicle={vehicle} soundEnabled={soundEnabled} />
               </div>
             ))}
@@ -50,24 +83,46 @@ export function FleetSection({ vehicles }: { vehicles: Vehicle[] }) {
             ) : null}
           </div>
 
-          {vehicles.length > 3 ? (
-            <div className="mt-2 flex justify-end gap-2">
-              <button
-                type="button"
-                aria-label="Scroll left"
-                onClick={() => scrollBy(-1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-charcoal-200 text-charcoal-700 hover:border-burgundy-400 hover:text-burgundy-700 dark:border-charcoal-700 dark:text-charcoal-300 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <button
-                type="button"
-                aria-label="Scroll right"
-                onClick={() => scrollBy(1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-charcoal-200 text-charcoal-700 hover:border-burgundy-400 hover:text-burgundy-700 dark:border-charcoal-700 dark:text-charcoal-300 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400"
-              >
-                <ChevronRight size={18} />
-              </button>
+          {vehicles.length > 1 ? (
+            <div className="mt-5 flex items-center justify-between">
+              <div className="flex gap-1.5">
+                {vehicles.map((vehicle, i) => (
+                  <button
+                    key={vehicle.id}
+                    type="button"
+                    aria-label={`Go to slide ${i + 1}`}
+                    aria-current={i === activeSlide}
+                    onClick={() => slideTo(i)}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all",
+                      i === activeSlide
+                        ? "w-6 bg-gold-500 dark:bg-gold-400"
+                        : "w-1.5 bg-charcoal-200 dark:bg-charcoal-700"
+                    )}
+                  />
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  aria-label="Previous vehicle"
+                  disabled={activeSlide === 0}
+                  onClick={() => step(-1)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-charcoal-200 text-charcoal-700 hover:border-burgundy-400 hover:text-burgundy-700 disabled:pointer-events-none disabled:opacity-40 dark:border-charcoal-700 dark:text-charcoal-300 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next vehicle"
+                  disabled={activeSlide === vehicles.length - 1}
+                  onClick={() => step(1)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-charcoal-200 text-charcoal-700 hover:border-burgundy-400 hover:text-burgundy-700 disabled:pointer-events-none disabled:opacity-40 dark:border-charcoal-700 dark:text-charcoal-300 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
             </div>
           ) : null}
         </div>

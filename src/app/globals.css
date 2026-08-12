@@ -42,6 +42,14 @@
   --color-charcoal-800: #242220;
   --color-charcoal-900: #171514;
   --color-charcoal-950: #0d0c0b;
+
+  /* Gold accent: a minimalistic "lining" for a premium feel. Fixed values
+     (not flipped per theme) — a mid-tone gold reads correctly against both
+     white and charcoal-950 backgrounds, always applied at low opacity. */
+  --color-gold-300: #e8d9a8;
+  --color-gold-400: #d4b96a;
+  --color-gold-500: #c9a227;
+  --color-gold-600: #a8841c;
 }
 
 body {
