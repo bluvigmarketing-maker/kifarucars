@@ -1,0 +1,157 @@
+/**
+ * Placeholder content shown until real data is added via the Supabase-backed
+ * admin dashboard (/kifaruadmin) or the business supplies real copy. Search
+ * this file's exports to find everything that still needs replacing.
+ */
+import type { Review, Vehicle } from "./types";
+
+export const BUSINESS = {
+  name: "Kifaru Car Hire",
+  tagline: "Reliable Car Hire & Leasing in Nairobi, Mombasa & Nanyuki",
+  yearsInBusiness: 15, // PLACEHOLDER
+  vehicleCount: "100+", // PLACEHOLDER
+  driverCount: "40+", // PLACEHOLDER
+  googleRating: 4.8, // PLACEHOLDER
+  googleReviewCount: 120, // PLACEHOLDER
+  phone: "+254 700 000 000", // PLACEHOLDER
+  whatsapp: "254700000000", // PLACEHOLDER (no leading +, for wa.me links)
+  email: "info@kifarucarhire.example", // PLACEHOLDER
+  locations: ["Nairobi", "Mombasa", "Nanyuki"],
+};
+
+export const PLACEHOLDER_VEHICLES: Vehicle[] = [
+  {
+    id: "ph-1",
+    name: "Land Cruiser Prado",
+    make: "Toyota",
+    year: 2022,
+    category: "Large Size SUV",
+    transmission: "Automatic",
+    seats: 7,
+    fuel_type: "Diesel",
+    luggage_capacity: "3 Big, 2 Small",
+    image_url: "/vehicles/placeholder-suv.svg",
+    is_available: true,
+    sort_order: 1,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "ph-2",
+    name: "RAV4",
+    make: "Toyota",
+    year: 2021,
+    category: "Crossover",
+    transmission: "Automatic",
+    seats: 5,
+    fuel_type: "Petrol",
+    luggage_capacity: "2 Big, 2 Small",
+    image_url: "/vehicles/placeholder-crossover.svg",
+    is_available: true,
+    sort_order: 2,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "ph-3",
+    name: "Alphard",
+    make: "Toyota",
+    year: 2020,
+    category: "Mini Van",
+    transmission: "Automatic",
+    seats: 7,
+    fuel_type: "Hybrid",
+    luggage_capacity: "1 Big, 3 Small",
+    image_url: "/vehicles/placeholder-van.svg",
+    is_available: true,
+    sort_order: 3,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "ph-4",
+    name: "Axio",
+    make: "Toyota",
+    year: 2019,
+    category: "Saloon",
+    transmission: "Automatic",
+    seats: 5,
+    fuel_type: "Petrol",
+    luggage_capacity: "1 Big, 1 Small",
+    image_url: "/vehicles/placeholder-saloon.svg",
+    is_available: true,
+    sort_order: 4,
+    created_at: new Date().toISOString(),
+  },
+];
+
+export const PLACEHOLDER_REVIEWS: Review[] = [
+  {
+    id: "phr-1",
+    author_name: "Jane W.", // PLACEHOLDER
+    rating: 5,
+    body: "Excellent service and very well-maintained vehicles. The driver was professional and on time.", // PLACEHOLDER
+    days_ago_label: "2 weeks ago",
+    is_featured: true,
+    sort_order: 1,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "phr-2",
+    author_name: "David K.", // PLACEHOLDER
+    rating: 5,
+    body: "Kifaru has been our go-to for corporate car hire for over a year now. Reliable every time.", // PLACEHOLDER
+    days_ago_label: "1 month ago",
+    is_featured: true,
+    sort_order: 2,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "phr-3",
+    author_name: "Amina H.", // PLACEHOLDER
+    rating: 4,
+    body: "Great fleet selection and friendly staff. Booking process was smooth from start to finish.", // PLACEHOLDER
+    days_ago_label: "1 month ago",
+    is_featured: true,
+    sort_order: 3,
+    created_at: new Date().toISOString(),
+  },
+];
+
+export const FAQS = [
+  {
+    question: "What types of vehicles do you offer?",
+    answer:
+      "We have a diverse fleet including executive saloons, crossovers, SUVs, mini-vans, and buses, catering to all business needs.",
+  },
+  {
+    question: "Do you own and maintain your fleet?",
+    answer:
+      "Yes, we own and maintain our entire fleet in-house to ensure reliability, safety and consistently high service standards.",
+  },
+  {
+    question: "Do you offer brand new vehicles on long-term leasing?",
+    answer:
+      "Yes, our long-term leasing plans can be tailored to include brand new vehicles depending on availability and lead time.",
+  },
+  {
+    question: "Do you offer chauffeur services?",
+    answer:
+      "Yes, all our vehicles can be booked with an experienced, professional chauffeur, or as a self-drive rental.",
+  },
+  {
+    question: "What durations do you offer for car hire?",
+    answer:
+      "We offer short-term rentals, long-term leases, and fully managed fleet services tailored to corporate and expat needs.",
+  },
+  {
+    question: "Do you provide roadside assistance?",
+    answer:
+      "Yes, roadside assistance is available across all our service locations for the duration of your hire or lease.",
+  },
+];
+
+export const VEHICLE_CATEGORIES: Vehicle["category"][] = [
+  "Saloon",
+  "Crossover",
+  "Mid-Size SUV",
+  "Mini Van",
+  "Large Size SUV",
+];
