@@ -21,7 +21,7 @@ const REASONS = [
     body: `With over ${BUSINESS.yearsInBusiness} years in the industry, we're a trusted partner for corporate mobility across Kenya.`,
   },
   {
-    Icon: Steering,
+    Icon: ShipWheel,
     title: "Flexible Hire & Leasing Solutions",
     body: "We tailor every plan to suit your short- or long-term vehicle needs, whether you're a corporate client or an expat.",
   },
