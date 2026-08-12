@@ -12,7 +12,7 @@ export default async function EditVehiclePage({
 
   return (
     <div>
-      <h1 className="font-display text-2xl text-charcoal-950">Edit Vehicle</h1>
+      <h1 className="font-display text-2xl text-charcoal-950 dark:text-white">Edit Vehicle</h1>
       <div className="mt-6">
         <VehicleForm vehicle={vehicle} />
       </div>

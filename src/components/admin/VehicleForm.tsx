@@ -1,17 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
 import { saveVehicle } from "@/lib/actions/vehicles";
 import { Button } from "@/components/ui/Button";
-import { VEHICLE_CATEGORY_VALUES, type VehicleFormState } from "@/lib/validations";
+import type { VehicleFormState } from "@/lib/validations";
 import type { Vehicle } from "@/lib/types";
 
 const initialState: VehicleFormState = { status: "idle" };
 
 const inputClasses =
-  "mt-1.5 w-full rounded-lg border border-charcoal-200 px-4 py-2.5 text-sm focus:border-burgundy-500 focus:outline-none";
-const labelClasses = "text-sm font-medium text-charcoal-700";
+  "mt-1.5 w-full rounded-lg border border-charcoal-200 bg-white px-4 py-2.5 text-sm text-charcoal-900 focus:border-burgundy-500 focus:outline-none dark:border-charcoal-700 dark:bg-charcoal-900 dark:text-charcoal-50";
+const labelClasses = "text-sm font-medium text-charcoal-700 dark:text-charcoal-300";
 
 export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
   const [state, formAction, pending] = useActionState(saveVehicle, initialState);
@@ -36,20 +35,6 @@ export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
           <label className={labelClasses}>Year</label>
           <input type="number" name="year" defaultValue={vehicle?.year} required className={inputClasses} />
           {errors?.year ? <p className="mt-1 text-xs text-burgundy-600">{errors.year[0]}</p> : null}
-        </div>
-        <div>
-          <label className={labelClasses}>Category</label>
-          <select name="category" defaultValue={vehicle?.category ?? ""} required className={inputClasses}>
-            <option value="" disabled>
-              Select category
-            </option>
-            {VEHICLE_CATEGORY_VALUES.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-          {errors?.category ? <p className="mt-1 text-xs text-burgundy-600">{errors.category[0]}</p> : null}
         </div>
         <div>
           <label className={labelClasses}>Transmission</label>
@@ -87,7 +72,7 @@ export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
         {errors?.imageUrl ? <p className="mt-1 text-xs text-burgundy-600">{errors.imageUrl[0]}</p> : null}
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-charcoal-700">
+      <label className="flex items-center gap-2 text-sm text-charcoal-700 dark:text-charcoal-300">
         <input type="checkbox" name="isAvailable" defaultChecked={vehicle?.is_available ?? true} />
         Visible on the public fleet listing
       </label>

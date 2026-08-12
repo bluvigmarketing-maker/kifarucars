@@ -10,8 +10,8 @@ export default async function AdminFleetPage() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl text-charcoal-950">Fleet</h1>
-          <p className="mt-1 text-sm text-charcoal-500">{vehicles.length} vehicles</p>
+          <h1 className="font-display text-2xl text-charcoal-950 dark:text-white">Fleet</h1>
+          <p className="mt-1 text-sm text-charcoal-500 dark:text-charcoal-400">{vehicles.length} vehicles</p>
         </div>
         <Button href="/kifaruadmin/fleet/new">
           <Plus size={16} /> Add Vehicle

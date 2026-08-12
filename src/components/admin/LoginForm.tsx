@@ -14,7 +14,7 @@ export function LoginForm({ initialError }: { initialError?: string }) {
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label htmlFor="email" className="text-sm font-medium text-charcoal-700">
+        <label htmlFor="email" className="text-sm font-medium text-charcoal-700 dark:text-charcoal-300">
           Email
         </label>
         <input
@@ -22,11 +22,11 @@ export function LoginForm({ initialError }: { initialError?: string }) {
           name="email"
           type="email"
           required
-          className="mt-1.5 w-full rounded-lg border border-charcoal-200 px-4 py-2.5 text-sm focus:border-burgundy-500 focus:outline-none"
+          className="mt-1.5 w-full rounded-lg border border-charcoal-200 bg-white px-4 py-2.5 text-sm text-charcoal-900 focus:border-burgundy-500 focus:outline-none dark:border-charcoal-700 dark:bg-charcoal-900 dark:text-charcoal-50"
         />
       </div>
       <div>
-        <label htmlFor="password" className="text-sm font-medium text-charcoal-700">
+        <label htmlFor="password" className="text-sm font-medium text-charcoal-700 dark:text-charcoal-300">
           Password
         </label>
         <input
@@ -34,7 +34,7 @@ export function LoginForm({ initialError }: { initialError?: string }) {
           name="password"
           type="password"
           required
-          className="mt-1.5 w-full rounded-lg border border-charcoal-200 px-4 py-2.5 text-sm focus:border-burgundy-500 focus:outline-none"
+          className="mt-1.5 w-full rounded-lg border border-charcoal-200 bg-white px-4 py-2.5 text-sm text-charcoal-900 focus:border-burgundy-500 focus:outline-none dark:border-charcoal-700 dark:bg-charcoal-900 dark:text-charcoal-50"
         />
       </div>
 

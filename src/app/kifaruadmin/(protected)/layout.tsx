@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/kifaruadmi
   const admin = await verifyAdmin();
 
   return (
-    <div className="flex min-h-screen bg-charcoal-50">
+    <div className="flex min-h-screen bg-charcoal-50 dark:bg-charcoal-950">
       <Sidebar adminLabel={admin.full_name ?? admin.email} />
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileNav />

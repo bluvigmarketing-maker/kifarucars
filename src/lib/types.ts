@@ -1,16 +1,8 @@
-export type VehicleCategory =
-  | "Saloon"
-  | "Crossover"
-  | "Mid-Size SUV"
-  | "Mini Van"
-  | "Large Size SUV";
-
 export type Vehicle = {
   id: string;
   name: string;
   make: string;
   year: number;
-  category: VehicleCategory;
   transmission: "Automatic" | "Manual";
   seats: number;
   fuel_type: string;

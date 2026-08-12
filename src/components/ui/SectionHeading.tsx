@@ -14,13 +14,13 @@ export function SectionHeading({
   return (
     <div className={cn(align === "center" && "text-center", className)}>
       {eyebrow ? (
-        <p className="text-sm font-semibold uppercase tracking-widest text-burgundy-600">
+        <p className="text-sm font-semibold uppercase tracking-widest text-burgundy-600 dark:text-burgundy-400">
           {eyebrow}
         </p>
       ) : null}
       <h2
         className={cn(
-          "mt-2 font-display text-3xl text-charcoal-950 sm:text-4xl",
+          "mt-2 font-display text-3xl text-charcoal-950 sm:text-4xl dark:text-white",
           "text-balance"
         )}
       >

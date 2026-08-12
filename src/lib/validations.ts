@@ -32,19 +32,10 @@ export type LoginFormState = {
   message?: string;
 };
 
-export const VEHICLE_CATEGORY_VALUES = [
-  "Saloon",
-  "Crossover",
-  "Mid-Size SUV",
-  "Mini Van",
-  "Large Size SUV",
-] as const;
-
 export const VehicleSchema = z.object({
   name: z.string().trim().min(1, { error: "Name is required." }),
   make: z.string().trim().min(1, { error: "Make is required." }),
   year: z.coerce.number().int().min(1990).max(2100),
-  category: z.enum(VEHICLE_CATEGORY_VALUES, { error: "Choose a category." }),
   transmission: z.enum(["Automatic", "Manual"]),
   seats: z.coerce.number().int().min(1).max(60),
   fuelType: z.string().trim().min(1, { error: "Fuel type is required." }),

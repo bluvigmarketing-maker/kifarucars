@@ -34,13 +34,13 @@ export function WhyChooseUs() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <SectionHeading eyebrow="Why Choose Us" title="Get Reliable Vehicle Solutions For Corporate And Expat Needs In Kenya" />
-            <p className="mt-5 text-charcoal-600">
+            <p className="mt-5 text-charcoal-600 dark:text-charcoal-300">
               Whatever your mobility needs, our team is on hand to design a
               solution that fits your business.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <Button href="#enquiry">Make An Enquiry</Button>
-              <a href={`tel:${BUSINESS.phone}`} className="text-sm font-medium text-charcoal-700 hover:text-burgundy-700">
+              <a href={`tel:${BUSINESS.phone}`} className="text-sm font-medium text-charcoal-700 hover:text-burgundy-700 dark:text-charcoal-300 dark:hover:text-burgundy-400">
                 {BUSINESS.phone}
               </a>
             </div>
@@ -48,12 +48,12 @@ export function WhyChooseUs() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {REASONS.map(({ Icon, title, body }) => (
-              <div key={title} className="rounded-2xl border border-charcoal-100 p-5">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-burgundy-50 text-burgundy-600">
+              <div key={title} className="rounded-2xl border border-charcoal-100 p-5 dark:border-charcoal-800">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-burgundy-50 text-burgundy-600 dark:bg-burgundy-950/40 dark:text-burgundy-400">
                   <Icon size={20} />
                 </div>
-                <h3 className="mt-4 font-semibold text-charcoal-950">{title}</h3>
-                <p className="mt-1.5 text-sm text-charcoal-600">{body}</p>
+                <h3 className="mt-4 font-semibold text-charcoal-950 dark:text-white">{title}</h3>
+                <p className="mt-1.5 text-sm text-charcoal-600 dark:text-charcoal-300">{body}</p>
               </div>
             ))}
           </div>

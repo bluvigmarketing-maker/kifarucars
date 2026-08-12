@@ -9,8 +9,8 @@ import type { Review } from "@/lib/types";
 const initialState: ReviewFormState = { status: "idle" };
 
 const inputClasses =
-  "mt-1.5 w-full rounded-lg border border-charcoal-200 px-4 py-2.5 text-sm focus:border-burgundy-500 focus:outline-none";
-const labelClasses = "text-sm font-medium text-charcoal-700";
+  "mt-1.5 w-full rounded-lg border border-charcoal-200 bg-white px-4 py-2.5 text-sm text-charcoal-900 focus:border-burgundy-500 focus:outline-none dark:border-charcoal-700 dark:bg-charcoal-900 dark:text-charcoal-50";
+const labelClasses = "text-sm font-medium text-charcoal-700 dark:text-charcoal-300";
 
 export function ReviewForm({ review }: { review?: Review }) {
   const [state, formAction, pending] = useActionState(saveReview, initialState);
@@ -49,7 +49,7 @@ export function ReviewForm({ review }: { review?: Review }) {
         {errors?.body ? <p className="mt-1 text-xs text-burgundy-600">{errors.body[0]}</p> : null}
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-charcoal-700">
+      <label className="flex items-center gap-2 text-sm text-charcoal-700 dark:text-charcoal-300">
         <input type="checkbox" name="isFeatured" defaultChecked={review?.is_featured ?? true} />
         Show on homepage
       </label>

@@ -12,7 +12,7 @@ export default async function EditReviewPage({
 
   return (
     <div>
-      <h1 className="font-display text-2xl text-charcoal-950">Edit Review</h1>
+      <h1 className="font-display text-2xl text-charcoal-950 dark:text-white">Edit Review</h1>
       <div className="mt-6">
         <ReviewForm review={review} />
       </div>

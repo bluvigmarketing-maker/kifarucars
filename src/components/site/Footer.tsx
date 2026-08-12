@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { BUSINESS } from "@/lib/placeholder-data";
@@ -39,9 +40,12 @@ export function Footer() {
 
         <div className="grid grid-cols-1 gap-10 py-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <span className="font-display text-xl text-white">Kifaru Car Hire</span>
+            <div className="flex items-center gap-2">
+              <Image src="/images/kifaru-icon.png" alt="" width={388} height={317} className="h-7 w-auto" />
+              <span className="font-display text-xl text-white">Kifaru Car Hire</span>
+            </div>
             <p className="mt-3 text-sm text-charcoal-400">
-              Reliable corporate and expat car hire, leasing and chauffeur
+              Reliable Toyota Land Cruiser Prado hire, leasing and chauffeur
               services across {BUSINESS.locations.join(", ")}.
             </p>
             <div className="mt-4 flex gap-3">

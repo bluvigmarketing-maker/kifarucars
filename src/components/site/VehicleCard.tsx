@@ -22,9 +22,9 @@ export function VehicleCard({
       transition={{ duration: 0.2 }}
       onHoverStart={play}
       onHoverEnd={stop}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-charcoal-100 bg-white shadow-sm transition-shadow hover:shadow-lg"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-charcoal-100 bg-white shadow-sm transition-shadow hover:shadow-lg dark:border-charcoal-800 dark:bg-charcoal-900"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-charcoal-50">
+      <div className="relative aspect-[4/3] overflow-hidden bg-charcoal-50 dark:bg-charcoal-800">
         <Image
           src={vehicle.image_url}
           alt={`${vehicle.make} ${vehicle.name}`}
@@ -39,26 +39,26 @@ export function VehicleCard({
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-burgundy-600">
+        <p className="text-xs font-semibold uppercase tracking-wide text-burgundy-600 dark:text-burgundy-400">
           {vehicle.make} &middot; {vehicle.year}
         </p>
-        <h3 className="mt-1 font-display text-xl text-charcoal-950">{vehicle.name}</h3>
+        <h3 className="mt-1 font-display text-xl text-charcoal-950 dark:text-white">{vehicle.name}</h3>
 
-        <dl className="mt-4 grid grid-cols-2 gap-y-2.5 text-sm text-charcoal-600">
+        <dl className="mt-4 grid grid-cols-2 gap-y-2.5 text-sm text-charcoal-600 dark:text-charcoal-300">
           <div className="flex items-center gap-1.5">
-            <Settings2 size={15} className="text-charcoal-400" />
+            <Settings2 size={15} className="text-charcoal-400 dark:text-charcoal-500" />
             {vehicle.transmission}
           </div>
           <div className="flex items-center gap-1.5">
-            <Users size={15} className="text-charcoal-400" />
+            <Users size={15} className="text-charcoal-400 dark:text-charcoal-500" />
             {vehicle.seats} Passengers
           </div>
           <div className="flex items-center gap-1.5">
-            <Fuel size={15} className="text-charcoal-400" />
+            <Fuel size={15} className="text-charcoal-400 dark:text-charcoal-500" />
             {vehicle.fuel_type}
           </div>
           <div className="flex items-center gap-1.5">
-            <Briefcase size={15} className="text-charcoal-400" />
+            <Briefcase size={15} className="text-charcoal-400 dark:text-charcoal-500" />
             {vehicle.luggage_capacity}
           </div>
         </dl>

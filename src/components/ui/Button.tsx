@@ -10,8 +10,8 @@ const variantClasses: Record<Variant, string> = {
   secondary:
     "bg-charcoal-900 text-white hover:bg-charcoal-800 focus-visible:outline-charcoal-900",
   outline:
-    "border border-charcoal-300 text-charcoal-900 hover:border-burgundy-600 hover:text-burgundy-700",
-  ghost: "text-charcoal-900 hover:text-burgundy-700",
+    "border border-charcoal-300 text-charcoal-900 hover:border-burgundy-600 hover:text-burgundy-700 dark:border-charcoal-700 dark:text-charcoal-50 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400",
+  ghost: "text-charcoal-900 hover:text-burgundy-700 dark:text-charcoal-50 dark:hover:text-burgundy-400",
 };
 
 const sizeClasses: Record<Size, string> = {

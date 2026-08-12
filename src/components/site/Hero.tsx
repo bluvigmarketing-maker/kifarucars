@@ -8,12 +8,25 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-charcoal-950 text-white">
       <Image
-        src="/rhino-mark.svg"
+        src="/images/hero-bg-desktop.png"
         alt=""
-        width={520}
-        height={520}
-        className="pointer-events-none absolute -right-24 -top-24 opacity-[0.06]"
+        fill
+        priority
+        sizes="(min-width: 1024px) 100vw, 10px"
+        className="hidden object-cover lg:block"
       />
+      <Image
+        src="/images/hero-bg-mobile.png"
+        alt=""
+        fill
+        priority
+        sizes="(max-width: 1023px) 100vw, 10px"
+        className="object-cover lg:hidden"
+      />
+
+      <div className="absolute inset-0 bg-charcoal-950/55" />
+      <div className="absolute inset-0 bg-gradient-to-r from-charcoal-950 via-charcoal-950/70 to-transparent lg:w-2/3" />
+      <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950/80 via-transparent to-transparent" />
 
       <Container className="relative py-20 sm:py-28">
         <div className="max-w-2xl">
@@ -24,8 +37,8 @@ export function Hero() {
             Kifaru Car Hire &amp; Leasing
           </h1>
           <p className="mt-5 max-w-lg text-charcoal-300">
-            From executive saloons to large SUVs, we own and manage our own
-            fleet — self-drive or with a professional chauffeur — in{" "}
+            We own and manage our own fleet of Toyota Land Cruiser Prados —
+            self-drive or with a professional chauffeur — in{" "}
             {BUSINESS.locations.join(", ")}.
           </p>
 

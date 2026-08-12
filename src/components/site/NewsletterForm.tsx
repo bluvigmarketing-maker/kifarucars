@@ -7,7 +7,7 @@ export function NewsletterForm() {
   const [submitted, setSubmitted] = useState(false);
 
   if (submitted) {
-    return <p className="text-sm text-charcoal-300">Thanks — you're on the list.</p>;
+    return <p className="text-sm text-charcoal-300">Thanks — you&apos;re on the list.</p>;
   }
 
   return (

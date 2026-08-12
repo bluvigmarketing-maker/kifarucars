@@ -7,7 +7,7 @@ import type { Review, Vehicle } from "./types";
 
 export const BUSINESS = {
   name: "Kifaru Car Hire",
-  tagline: "Reliable Car Hire & Leasing in Nairobi, Mombasa & Nanyuki",
+  tagline: "Reliable Prado Car Hire & Leasing Across Kenya",
   yearsInBusiness: 15, // PLACEHOLDER
   vehicleCount: "100+", // PLACEHOLDER
   driverCount: "40+", // PLACEHOLDER
@@ -16,7 +16,7 @@ export const BUSINESS = {
   phone: "+254 700 000 000", // PLACEHOLDER
   whatsapp: "254700000000", // PLACEHOLDER (no leading +, for wa.me links)
   email: "info@kifarucarhire.example", // PLACEHOLDER
-  locations: ["Nairobi", "Mombasa", "Nanyuki"],
+  locations: ["Nairobi", "Kisumu", "Mombasa", "Nanyuki", "Nakuru"],
 };
 
 export const PLACEHOLDER_VEHICLES: Vehicle[] = [
@@ -24,8 +24,7 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     id: "ph-1",
     name: "Land Cruiser Prado",
     make: "Toyota",
-    year: 2022,
-    category: "Large Size SUV",
+    year: 2023,
     transmission: "Automatic",
     seats: 7,
     fuel_type: "Diesel",
@@ -37,45 +36,42 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
   },
   {
     id: "ph-2",
-    name: "RAV4",
+    name: "Land Cruiser Prado",
     make: "Toyota",
-    year: 2021,
-    category: "Crossover",
+    year: 2022,
     transmission: "Automatic",
-    seats: 5,
-    fuel_type: "Petrol",
-    luggage_capacity: "2 Big, 2 Small",
-    image_url: "/vehicles/placeholder-crossover.svg",
+    seats: 7,
+    fuel_type: "Diesel",
+    luggage_capacity: "3 Big, 2 Small",
+    image_url: "/vehicles/placeholder-suv.svg",
     is_available: true,
     sort_order: 2,
     created_at: new Date().toISOString(),
   },
   {
     id: "ph-3",
-    name: "Alphard",
+    name: "Land Cruiser Prado",
     make: "Toyota",
-    year: 2020,
-    category: "Mini Van",
-    transmission: "Automatic",
+    year: 2021,
+    transmission: "Manual",
     seats: 7,
-    fuel_type: "Hybrid",
-    luggage_capacity: "1 Big, 3 Small",
-    image_url: "/vehicles/placeholder-van.svg",
+    fuel_type: "Diesel",
+    luggage_capacity: "3 Big, 2 Small",
+    image_url: "/vehicles/placeholder-suv.svg",
     is_available: true,
     sort_order: 3,
     created_at: new Date().toISOString(),
   },
   {
     id: "ph-4",
-    name: "Axio",
+    name: "Land Cruiser Prado",
     make: "Toyota",
-    year: 2019,
-    category: "Saloon",
+    year: 2020,
     transmission: "Automatic",
     seats: 5,
     fuel_type: "Petrol",
-    luggage_capacity: "1 Big, 1 Small",
-    image_url: "/vehicles/placeholder-saloon.svg",
+    luggage_capacity: "2 Big, 2 Small",
+    image_url: "/vehicles/placeholder-suv.svg",
     is_available: true,
     sort_order: 4,
     created_at: new Date().toISOString(),
@@ -119,7 +115,7 @@ export const FAQS = [
   {
     question: "What types of vehicles do you offer?",
     answer:
-      "We have a diverse fleet including executive saloons, crossovers, SUVs, mini-vans, and buses, catering to all business needs.",
+      "We specialize exclusively in the Toyota Land Cruiser Prado — a rugged, comfortable SUV well-suited to Kenyan roads and long-distance travel. We maintain several Prado units across different model years so there's always one available for your dates.",
   },
   {
     question: "Do you own and maintain your fleet?",
@@ -146,12 +142,4 @@ export const FAQS = [
     answer:
       "Yes, roadside assistance is available across all our service locations for the duration of your hire or lease.",
   },
-];
-
-export const VEHICLE_CATEGORIES: Vehicle["category"][] = [
-  "Saloon",
-  "Crossover",
-  "Mid-Size SUV",
-  "Mini Van",
-  "Large Size SUV",
 ];
