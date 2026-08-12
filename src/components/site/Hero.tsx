@@ -21,8 +21,7 @@ export function Hero() {
             {BUSINESS.tagline}
           </p>
           <h1 className="mt-4 font-display text-4xl leading-tight sm:text-5xl">
-            Over {BUSINESS.yearsInBusiness} Years Serving Corporates &amp;
-            Expats Across Kenya
+            Kifaru Car Hire &amp; Leasing
           </h1>
           <p className="mt-5 max-w-lg text-charcoal-300">
             From executive saloons to large SUVs, we own and manage our own

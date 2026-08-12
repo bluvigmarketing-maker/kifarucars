@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Kifaru Car Hire",
   },
   description:
-    "Kifaru Car Hire provides reliable corporate and expat car hire, leasing and chauffeur services across Nairobi, Mombasa and Nanyuki, Kenya.",
+    "Self-drive and chauffeur-driven car hire and vehicle leasing in Nairobi, Mombasa and Nanyuki. Kifaru Car Hire runs its own fleet for corporates and expats across Kenya.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
