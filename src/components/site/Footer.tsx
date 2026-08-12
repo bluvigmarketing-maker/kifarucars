@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { BUSINESS } from "@/lib/placeholder-data";
+import { FacebookIcon, InstagramIcon, LinkedInIcon, XIcon } from "@/components/site/SocialIcons";
+import { NewsletterForm } from "@/components/site/NewsletterForm";
 
 const FOOTER_LINKS = [
   { label: "Home", href: "/" },
@@ -15,10 +15,10 @@ const FOOTER_LINKS = [
 ];
 
 const SOCIALS = [
-  { label: "Facebook", Icon: Facebook, href: "#" },
-  { label: "Instagram", Icon: Instagram, href: "#" },
-  { label: "LinkedIn", Icon: Linkedin, href: "#" },
-  { label: "Twitter", Icon: Twitter, href: "#" },
+  { label: "Facebook", Icon: FacebookIcon, href: "#" },
+  { label: "Instagram", Icon: InstagramIcon, href: "#" },
+  { label: "LinkedIn", Icon: LinkedInIcon, href: "#" },
+  { label: "Twitter", Icon: XIcon, href: "#" },
 ];
 
 export function Footer() {
@@ -34,17 +34,7 @@ export function Footer() {
               Be the first to know. Sign up to our newsletter.
             </p>
           </div>
-          <form className="flex w-full max-w-md gap-2" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              required
-              placeholder="Your email address"
-              className="min-w-0 flex-1 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-charcoal-400 focus:border-burgundy-400 focus:outline-none"
-            />
-            <Button type="submit" size="sm">
-              Subscribe
-            </Button>
-          </form>
+          <NewsletterForm />
         </div>
 
         <div className="grid grid-cols-1 gap-10 py-10 sm:grid-cols-2 lg:grid-cols-4">

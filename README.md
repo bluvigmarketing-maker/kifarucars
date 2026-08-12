@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kifaru Car Hire
 
-## Getting Started
+Corporate & expat car hire website. Next.js 16 (App Router) + Tailwind CSS v4
+on the frontend, Supabase for auth/data, deployed on Vercel.
 
-First, run the development server:
+See [MILESTONES.md](./MILESTONES.md) for build progress and what's left.
+
+## Stack notes
+
+- **Next.js 16** — `middleware.ts` is now `proxy.ts` (see `src/proxy.ts`); this
+  project keeps Cache Components (PPR) **off** for a simpler, predictable
+  data-fetching model.
+- **Fleet, enquiries and reviews are Supabase-backed.** Until Supabase is
+  configured (see below), the public site falls back to clearly-labeled
+  placeholder content in `src/lib/placeholder-data.ts` — the site always runs
+  and is demoable, and the enquiry form will say it isn't connected yet.
+- **Admin dashboard** lives at `/kifaruadmin`, gated by Supabase Auth.
+
+## 1. Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Without Supabase configured, the homepage shows
+placeholder fleet/review content and `/kifaruadmin` redirects to a login page
+that can't yet authenticate anyone.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 2. Connect Supabase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a project at [supabase.com](https://supabase.com).
+2. Copy `.env.example` to `.env.local` and fill in **Project Settings → API**:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=
+   ```
+3. Run the SQL in `supabase/migrations/0001_init.sql` via the Supabase SQL
+   editor (or `supabase db push` if you're using the CLI). This creates
+   `vehicles`, `enquiries`, `reviews`, and `profiles` with row-level security.
+4. Optionally run `supabase/migrations/0002_seed_optional.sql` to seed a
+   handful of starter vehicles and reviews.
+5. Restart `npm run dev` so the new env vars are picked up.
 
-## Learn More
+## 3. Create your first admin user
 
-To learn more about Next.js, take a look at the following resources:
+The `profiles` table is what actually grants `/kifaruadmin` access — a
+Supabase Auth account alone isn't enough (see `src/lib/admin/dal.ts`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. In the Supabase dashboard, go to **Authentication → Users → Add user**
+   and create a user with an email/password.
+2. Copy that user's UUID, then run in the SQL editor:
+   ```sql
+   insert into public.profiles (id, email, full_name, role)
+   values ('<paste-user-uuid>', '<their-email>', '<their-name>', 'admin');
+   ```
+3. Sign in at `/kifaruadmin/login`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 4. Deploy to Vercel
 
-## Deploy on Vercel
+1. Push this repo to GitHub/GitLab/Bitbucket and import it in Vercel.
+2. Add the two `NEXT_PUBLIC_SUPABASE_*` environment variables in the Vercel
+   project settings (Production + Preview).
+3. Deploy. No other configuration is required — `proxy.ts` and Server Actions
+   run natively on Vercel.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Replacing placeholder content
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Search `src/lib/placeholder-data.ts` — it has every placeholder value
+(phone, WhatsApp number, email, stats, sample vehicles/reviews) called out
+with `// PLACEHOLDER` comments. Real fleet vehicles and reviews should be
+added through `/kifaruadmin` once Supabase is connected, rather than edited
+in this file.
+
+## Project structure
+
+```
+src/
+  app/
+    (site)/            # public homepage (Header/Footer layout)
+    kifaruadmin/        # admin dashboard
+      login/            # public login page
+      (protected)/       # auth-gated dashboard pages
+  components/
+    site/               # homepage sections
+    admin/              # dashboard UI
+    ui/                 # shared primitives (Button, Container, ...)
+  lib/
+    actions/            # Server Actions (mutations)
+    admin/              # admin-only data access + auth DAL
+    supabase/           # Supabase client helpers
+  hooks/
+    useEngineSound.ts   # Web Audio API "engine rev" hover sound
+supabase/
+  migrations/           # SQL schema + optional seed data
+```
