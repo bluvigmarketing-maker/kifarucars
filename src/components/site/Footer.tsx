@@ -41,7 +41,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-10 py-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-gold-400/40 p-1">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-gold-400/70 p-1 shadow-[0_0_12px_-2px_rgba(212,185,106,0.5)]">
                 <Image src="/images/kifaru-icon.png" alt="" width={388} height={317} className="h-full w-auto" />
               </span>
               <span className="font-display text-xl text-white">Kifaru Car Hire</span>

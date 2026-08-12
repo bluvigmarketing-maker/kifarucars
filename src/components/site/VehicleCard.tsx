@@ -22,7 +22,7 @@ export function VehicleCard({
       transition={{ duration: 0.2 }}
       onHoverStart={play}
       onHoverEnd={stop}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gold-500/30 bg-white shadow-sm transition-shadow hover:shadow-lg dark:border-gold-400/25 dark:bg-charcoal-900"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-gold-500/60 bg-white shadow-[0_0_20px_-6px_rgba(201,162,39,0.5)] transition-shadow hover:shadow-[0_0_24px_-4px_rgba(201,162,39,0.65)] dark:border-gold-400/50 dark:shadow-[0_0_20px_-6px_rgba(212,185,106,0.4)] dark:bg-charcoal-900"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-charcoal-50 dark:bg-charcoal-800">
         <Image

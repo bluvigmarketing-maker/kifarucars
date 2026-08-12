@@ -13,7 +13,7 @@ export function ReviewsTable({ reviews }: { reviews: Review[] }) {
   return (
     <div className="space-y-3">
       {reviews.map((review) => (
-        <div key={review.id} className="rounded-2xl border border-gold-500/30 bg-white p-5 dark:border-gold-400/25 dark:bg-charcoal-900">
+        <div key={review.id} className="rounded-2xl border-2 border-gold-500/60 bg-white p-5 shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-0.5 text-burgundy-600 dark:text-burgundy-400">

@@ -22,7 +22,7 @@ export function NewsletterForm() {
         type="email"
         required
         placeholder="Your email address"
-        className="min-w-0 flex-1 rounded-full border border-gold-400/25 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-charcoal-400 focus:border-burgundy-400 focus:outline-none"
+        className="min-w-0 flex-1 rounded-full border-2 border-gold-400/45 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-charcoal-400 focus:border-burgundy-400 focus:outline-none"
       />
       <Button type="submit" size="sm">
         Subscribe

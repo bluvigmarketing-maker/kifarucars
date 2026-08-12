@@ -41,7 +41,7 @@ export default async function AdminOverviewPage() {
           <Link
             key={label}
             href={href}
-            className="rounded-2xl border border-gold-500/30 bg-white p-6 transition-shadow hover:shadow-md dark:border-gold-400/25 dark:bg-charcoal-900"
+            className="rounded-2xl border-2 border-gold-500/60 bg-white p-6 shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] transition-shadow hover:shadow-[0_0_22px_-4px_rgba(201,162,39,0.6)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-burgundy-50 text-burgundy-600 dark:bg-burgundy-950/40 dark:text-burgundy-400">
               <Icon size={18} />

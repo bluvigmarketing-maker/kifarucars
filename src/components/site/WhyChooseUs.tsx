@@ -48,7 +48,7 @@ export function WhyChooseUs() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {REASONS.map(({ Icon, title, body }) => (
-              <div key={title} className="rounded-2xl border border-gold-500/30 p-5 dark:border-gold-400/25">
+              <div key={title} className="rounded-2xl border-2 border-gold-500/60 p-5 shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)]">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-burgundy-50 text-burgundy-600 dark:bg-burgundy-950/40 dark:text-burgundy-400">
                   <Icon size={20} />
                 </div>

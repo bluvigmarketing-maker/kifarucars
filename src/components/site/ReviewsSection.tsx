@@ -24,7 +24,7 @@ export function ReviewsSection({ reviews }: { reviews: Review[] }) {
 
         <div className="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {reviews.map((review) => (
-            <div key={review.id} className="rounded-2xl border border-gold-500/30 bg-white p-6 shadow-sm dark:border-gold-400/25 dark:bg-charcoal-900">
+            <div key={review.id} className="rounded-2xl border-2 border-gold-500/60 bg-white p-6 shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900">
               <div className="flex items-center gap-0.5 text-burgundy-600 dark:text-burgundy-400">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} size={14} fill={i < review.rating ? "currentColor" : "none"} />

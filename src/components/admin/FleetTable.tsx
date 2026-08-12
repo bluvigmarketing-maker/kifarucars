@@ -11,7 +11,7 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-gold-500/30 bg-white dark:border-gold-400/25 dark:bg-charcoal-900">
+    <div className="overflow-x-auto rounded-2xl border-2 border-gold-500/60 bg-white shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900">
       <table className="w-full text-left text-sm">
         <thead className="border-b border-charcoal-100 text-xs uppercase tracking-wide text-charcoal-500 dark:border-charcoal-800 dark:text-charcoal-400">
           <tr>
