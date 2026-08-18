@@ -22,6 +22,16 @@ export async function saveVehicle(
     luggageCapacity: formData.get("luggageCapacity"),
     imageUrl: formData.get("imageUrl"),
     isAvailable: formData.get("isAvailable") === "on",
+    mileage: formData.get("mileage"),
+    chassisNumber: formData.get("chassisNumber"),
+    registrationNumber: formData.get("registrationNumber"),
+    ownerName: formData.get("ownerName"),
+    ownerPhone: formData.get("ownerPhone"),
+    ownerEmail: formData.get("ownerEmail"),
+    additionalFeatures: formData.get("additionalFeatures"),
+    galleryUrls: formData.get("galleryUrls"),
+    videoUrl: formData.get("videoUrl"),
+    hoverSoundUrl: formData.get("hoverSoundUrl"),
   });
 
   if (!validated.success) {
@@ -43,6 +53,16 @@ export async function saveVehicle(
     luggage_capacity: validated.data.luggageCapacity,
     image_url: validated.data.imageUrl,
     is_available: validated.data.isAvailable ?? false,
+    mileage: validated.data.mileage ?? null,
+    chassis_number: validated.data.chassisNumber || null,
+    registration_number: validated.data.registrationNumber || null,
+    owner_name: validated.data.ownerName || null,
+    owner_phone: validated.data.ownerPhone || null,
+    owner_email: validated.data.ownerEmail || null,
+    additional_features: validated.data.additionalFeatures,
+    gallery_urls: validated.data.galleryUrls,
+    video_url: validated.data.videoUrl || null,
+    hover_sound_url: validated.data.hoverSoundUrl || null,
   };
 
   const { error } =
@@ -56,6 +76,7 @@ export async function saveVehicle(
 
   revalidatePath("/kifaruadmin/fleet");
   revalidatePath("/");
+  if (typeof id === "string" && id.length > 0) revalidatePath(`/fleet/${id}`);
   redirect("/kifaruadmin/fleet");
 }
 

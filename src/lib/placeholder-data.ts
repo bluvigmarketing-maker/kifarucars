@@ -9,14 +9,41 @@ export const BUSINESS = {
   name: "Kifaru Car Hire",
   tagline: "Reliable Prado Car Hire & Leasing Across Kenya",
   yearsInBusiness: 15, // PLACEHOLDER
-  vehicleCount: "100+", // PLACEHOLDER
-  driverCount: "40+", // PLACEHOLDER
+  vehicleCount: "20+", // PLACEHOLDER
+  driverCount: "15", // PLACEHOLDER
   googleRating: 4.8, // PLACEHOLDER
   googleReviewCount: 120, // PLACEHOLDER
   phone: "+254 700 000 000", // PLACEHOLDER
   whatsapp: "254700000000", // PLACEHOLDER (no leading +, for wa.me links)
   email: "info@kifarucarhire.example", // PLACEHOLDER
   locations: ["Nairobi", "Kisumu", "Mombasa", "Nanyuki", "Nakuru"],
+};
+
+const PLACEHOLDER_VEHICLE_STAFF_FIELDS: Pick<
+  Vehicle,
+  | "mileage"
+  | "chassis_number"
+  | "registration_number"
+  | "owner_name"
+  | "owner_phone"
+  | "owner_email"
+  | "logbook_path"
+  | "additional_features"
+  | "gallery_urls"
+  | "video_url"
+  | "hover_sound_url"
+> = {
+  mileage: null,
+  chassis_number: null,
+  registration_number: null,
+  owner_name: null,
+  owner_phone: null,
+  owner_email: null,
+  logbook_path: null,
+  additional_features: [],
+  gallery_urls: [],
+  video_url: null,
+  hover_sound_url: null,
 };
 
 export const PLACEHOLDER_VEHICLES: Vehicle[] = [
@@ -33,6 +60,7 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     is_available: true,
     sort_order: 1,
     created_at: new Date().toISOString(),
+    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
   },
   {
     id: "ph-2",
@@ -47,6 +75,7 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     is_available: true,
     sort_order: 2,
     created_at: new Date().toISOString(),
+    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
   },
   {
     id: "ph-3",
@@ -61,6 +90,7 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     is_available: true,
     sort_order: 3,
     created_at: new Date().toISOString(),
+    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
   },
   {
     id: "ph-4",
@@ -75,6 +105,7 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     is_available: true,
     sort_order: 4,
     created_at: new Date().toISOString(),
+    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
   },
 ];
 
@@ -88,6 +119,7 @@ export const PLACEHOLDER_REVIEWS: Review[] = [
     is_featured: true,
     sort_order: 1,
     created_at: new Date().toISOString(),
+    vehicle_id: null,
   },
   {
     id: "phr-2",
@@ -98,6 +130,7 @@ export const PLACEHOLDER_REVIEWS: Review[] = [
     is_featured: true,
     sort_order: 2,
     created_at: new Date().toISOString(),
+    vehicle_id: null,
   },
   {
     id: "phr-3",
@@ -108,6 +141,7 @@ export const PLACEHOLDER_REVIEWS: Review[] = [
     is_featured: true,
     sort_order: 3,
     created_at: new Date().toISOString(),
+    vehicle_id: null,
   },
 ];
 

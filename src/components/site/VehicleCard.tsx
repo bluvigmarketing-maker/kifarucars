@@ -1,27 +1,45 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, Fuel, Settings2, Users, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useEngineSound } from "@/hooks/useEngineSound";
-import type { Vehicle } from "@/lib/types";
+import type { PublicVehicle } from "@/lib/types";
 
 export function VehicleCard({
   vehicle,
   soundEnabled,
 }: {
-  vehicle: Vehicle;
+  vehicle: PublicVehicle;
   soundEnabled: boolean;
 }) {
-  const { play, stop } = useEngineSound(soundEnabled);
+  const { play, stop } = useEngineSound(soundEnabled, vehicle.hover_sound_url);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleHoverStart = () => {
+    play();
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReducedMotion) videoRef.current?.play().catch(() => {});
+  };
+
+  const handleHoverEnd = () => {
+    stop();
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  };
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
-      onHoverStart={play}
-      onHoverEnd={stop}
+      onHoverStart={handleHoverStart}
+      onHoverEnd={handleHoverEnd}
       className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-gold-500/60 bg-white shadow-[0_0_20px_-6px_rgba(201,162,39,0.5)] transition-shadow hover:shadow-[0_0_24px_-4px_rgba(201,162,39,0.65)] dark:border-gold-400/50 dark:shadow-[0_0_20px_-6px_rgba(212,185,106,0.4)] dark:bg-charcoal-900"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-charcoal-50 dark:bg-charcoal-800">
@@ -31,6 +49,17 @@ export function VehicleCard({
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        {vehicle.video_url ? (
+          <video
+            ref={videoRef}
+            src={vehicle.video_url}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          />
+        ) : null}
         {soundEnabled ? (
           <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">
             <Volume2 size={12} /> Hover for sound
@@ -64,7 +93,7 @@ export function VehicleCard({
         </dl>
 
         <div className="mt-5 flex gap-2.5 pt-1">
-          <Button href="#enquiry" variant="outline" size="sm" className="flex-1">
+          <Button href={`/fleet/${vehicle.id}`} variant="outline" size="sm" className="flex-1">
             View Details
           </Button>
           <Button href="#enquiry" size="sm" className="flex-1">

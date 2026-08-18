@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { label: "Our Fleet", href: "#fleet" },
   { label: "About Us", href: "#about" },
   { label: "Contact Us", href: "#enquiry" },
+  { label: "List Your Car", href: "/list-your-car" },
 ];
 
 export function Header() {

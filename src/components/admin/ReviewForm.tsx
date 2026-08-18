@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { saveReview } from "@/lib/actions/reviews";
 import { Button } from "@/components/ui/Button";
 import type { ReviewFormState } from "@/lib/validations";
-import type { Review } from "@/lib/types";
+import type { Review, Vehicle } from "@/lib/types";
 
 const initialState: ReviewFormState = { status: "idle" };
 
@@ -12,7 +12,7 @@ const inputClasses =
   "mt-1.5 w-full rounded-lg border border-charcoal-200 bg-white px-4 py-2.5 text-sm text-charcoal-900 focus:border-burgundy-500 focus:outline-none dark:border-charcoal-700 dark:bg-charcoal-900 dark:text-charcoal-50";
 const labelClasses = "text-sm font-medium text-charcoal-700 dark:text-charcoal-300";
 
-export function ReviewForm({ review }: { review?: Review }) {
+export function ReviewForm({ review, vehicles = [] }: { review?: Review; vehicles?: Vehicle[] }) {
   const [state, formAction, pending] = useActionState(saveReview, initialState);
   const errors = state.status === "error" ? state.errors : undefined;
 
@@ -47,6 +47,21 @@ export function ReviewForm({ review }: { review?: Review }) {
         <label className={labelClasses}>Review text</label>
         <textarea name="body" defaultValue={review?.body} required rows={4} className={inputClasses} />
         {errors?.body ? <p className="mt-1 text-xs text-burgundy-600">{errors.body[0]}</p> : null}
+      </div>
+
+      <div>
+        <label className={labelClasses}>Which vehicle is this about? (optional)</label>
+        <select name="vehicleId" defaultValue={review?.vehicle_id ?? ""} className={inputClasses}>
+          <option value="">General review (not tied to a vehicle)</option>
+          {vehicles.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.make} {v.name} &middot; {v.year}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-charcoal-500 dark:text-charcoal-400">
+          Shown on that vehicle&apos;s detail page as a review from a former user.
+        </p>
       </div>
 
       <label className="flex items-center gap-2 text-sm text-charcoal-700 dark:text-charcoal-300">

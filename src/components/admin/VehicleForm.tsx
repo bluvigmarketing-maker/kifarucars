@@ -3,6 +3,12 @@
 import { useActionState } from "react";
 import { saveVehicle } from "@/lib/actions/vehicles";
 import { Button } from "@/components/ui/Button";
+import {
+  CoverImageField,
+  GalleryUploadField,
+  HoverSoundUploadField,
+  VideoUploadField,
+} from "@/components/admin/VehicleMediaFields";
 import type { VehicleFormState } from "@/lib/validations";
 import type { Vehicle } from "@/lib/types";
 
@@ -60,22 +66,67 @@ export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
         </div>
       </div>
 
-      <div>
-        <label className={labelClasses}>Image URL</label>
-        <input
-          name="imageUrl"
-          defaultValue={vehicle?.image_url}
-          required
-          className={inputClasses}
-          placeholder="/vehicles/placeholder-suv.svg or a Supabase Storage URL"
-        />
-        {errors?.imageUrl ? <p className="mt-1 text-xs text-burgundy-600">{errors.imageUrl[0]}</p> : null}
-      </div>
+      <CoverImageField defaultValue={vehicle?.image_url} error={errors?.imageUrl?.[0]} />
 
       <label className="flex items-center gap-2 text-sm text-charcoal-700 dark:text-charcoal-300">
         <input type="checkbox" name="isAvailable" defaultChecked={vehicle?.is_available ?? true} />
         Visible on the public fleet listing
       </label>
+
+      <div className="space-y-5 border-t border-charcoal-100 pt-5 dark:border-charcoal-800">
+        <p className="text-sm font-semibold uppercase tracking-widest text-charcoal-400 dark:text-charcoal-500">
+          Media
+        </p>
+        <GalleryUploadField defaultValue={vehicle?.gallery_urls} />
+        <VideoUploadField defaultValue={vehicle?.video_url} />
+        <HoverSoundUploadField defaultValue={vehicle?.hover_sound_url} />
+      </div>
+
+      <div className="border-t border-charcoal-100 pt-5 dark:border-charcoal-800">
+        <p className="text-sm font-semibold uppercase tracking-widest text-charcoal-400 dark:text-charcoal-500">
+          Staff-only details
+        </p>
+        <p className="mt-1 text-xs text-charcoal-500 dark:text-charcoal-400">
+          Never shown on the public site — used for internal records and ownership verification.
+        </p>
+
+        <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div>
+            <label className={labelClasses}>Mileage (km)</label>
+            <input type="number" name="mileage" min={0} defaultValue={vehicle?.mileage ?? ""} className={inputClasses} />
+          </div>
+          <div>
+            <label className={labelClasses}>Chassis number</label>
+            <input name="chassisNumber" defaultValue={vehicle?.chassis_number ?? ""} className={inputClasses} />
+          </div>
+          <div>
+            <label className={labelClasses}>Registration number</label>
+            <input name="registrationNumber" defaultValue={vehicle?.registration_number ?? ""} className={inputClasses} placeholder="e.g. KDA 123X" />
+          </div>
+          <div>
+            <label className={labelClasses}>Owner name</label>
+            <input name="ownerName" defaultValue={vehicle?.owner_name ?? ""} className={inputClasses} />
+          </div>
+          <div>
+            <label className={labelClasses}>Owner phone</label>
+            <input name="ownerPhone" defaultValue={vehicle?.owner_phone ?? ""} className={inputClasses} />
+          </div>
+          <div>
+            <label className={labelClasses}>Owner email</label>
+            <input type="email" name="ownerEmail" defaultValue={vehicle?.owner_email ?? ""} className={inputClasses} />
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <label className={labelClasses}>Additional features</label>
+          <input
+            name="additionalFeatures"
+            defaultValue={vehicle?.additional_features?.join(", ") ?? ""}
+            className={inputClasses}
+            placeholder="Comma-separated, e.g. Sunroof, Reverse camera, Leather seats"
+          />
+        </div>
+      </div>
 
       {state.status === "error" && state.message ? (
         <p className="text-sm text-burgundy-600">{state.message}</p>

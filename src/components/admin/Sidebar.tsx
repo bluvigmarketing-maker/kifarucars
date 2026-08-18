@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Car, LayoutDashboard, LogOut, MessageSquare, Star } from "lucide-react";
+import { Car, ClipboardList, LayoutDashboard, LogOut, MessageSquare, Star } from "lucide-react";
 import { logout } from "@/lib/actions/admin-auth";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 export const NAV_ITEMS = [
   { label: "Overview", href: "/kifaruadmin", Icon: LayoutDashboard },
   { label: "Fleet", href: "/kifaruadmin/fleet", Icon: Car },
+  { label: "Applications", href: "/kifaruadmin/applications", Icon: ClipboardList },
   { label: "Enquiries", href: "/kifaruadmin/enquiries", Icon: MessageSquare },
   { label: "Reviews", href: "/kifaruadmin/reviews", Icon: Star },
 ];

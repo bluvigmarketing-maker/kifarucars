@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { Enquiry, Review, Vehicle } from "@/lib/types";
+import type { Enquiry, Review, Vehicle, VehicleApplication } from "@/lib/types";
 
 export async function listAllVehicles(): Promise<Vehicle[]> {
   const supabase = await createClient();
@@ -41,11 +41,31 @@ export async function getReviewById(id: string): Promise<Review | null> {
   return (data as Review) ?? null;
 }
 
+export async function listAllApplications(): Promise<VehicleApplication[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("vehicle_applications")
+    .select("*")
+    .order("created_at", { ascending: false });
+  return (data ?? []) as VehicleApplication[];
+}
+
+export async function getApplicationById(id: string): Promise<VehicleApplication | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("vehicle_applications")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  return (data as VehicleApplication) ?? null;
+}
+
 export async function getDashboardStats() {
-  const [vehicles, enquiries, reviews] = await Promise.all([
+  const [vehicles, enquiries, reviews, applications] = await Promise.all([
     listAllVehicles(),
     listAllEnquiries(),
     listAllReviews(),
+    listAllApplications(),
   ]);
 
   return {
@@ -54,5 +74,7 @@ export async function getDashboardStats() {
     newEnquiryCount: enquiries.filter((e) => e.status === "new").length,
     totalEnquiryCount: enquiries.length,
     reviewCount: reviews.length,
+    pendingApplicationCount: applications.filter((a) => a.status === "pending").length,
+    totalApplicationCount: applications.length,
   };
 }

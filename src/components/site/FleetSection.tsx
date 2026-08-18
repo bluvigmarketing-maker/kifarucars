@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VehicleCard } from "@/components/site/VehicleCard";
 import { cn } from "@/lib/cn";
-import type { Vehicle } from "@/lib/types";
+import type { PublicVehicle } from "@/lib/types";
 
-export function FleetSection({ vehicles }: { vehicles: Vehicle[] }) {
+export function FleetSection({ vehicles }: { vehicles: PublicVehicle[] }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [activeSlide, setActiveSlide] = useState(0);
   const scrollerRef = useRef<HTMLDivElement>(null);

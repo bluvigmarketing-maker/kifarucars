@@ -18,6 +18,7 @@ export async function saveReview(
     body: formData.get("body"),
     daysAgoLabel: formData.get("daysAgoLabel"),
     isFeatured: formData.get("isFeatured") === "on",
+    vehicleId: formData.get("vehicleId"),
   });
 
   if (!validated.success) {
@@ -32,6 +33,7 @@ export async function saveReview(
     body: validated.data.body,
     days_ago_label: validated.data.daysAgoLabel ?? "",
     is_featured: validated.data.isFeatured ?? false,
+    vehicle_id: validated.data.vehicleId || null,
   };
 
   const { error } =

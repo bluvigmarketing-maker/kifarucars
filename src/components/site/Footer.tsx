@@ -13,6 +13,9 @@ const FOOTER_LINKS = [
   { label: "Corporate Leasing", href: "#services" },
   { label: "Contact Us", href: "#enquiry" },
   { label: "FAQs", href: "#faqs" },
+  { label: "List Your Car", href: "/list-your-car" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
 ];
 
 const SOCIALS = [
@@ -111,7 +114,11 @@ export function Footer() {
 
         <div className="flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-charcoal-500 sm:flex-row sm:items-center sm:justify-between">
           <p>&copy; {new Date().getFullYear()} Kifaru Car Hire. All rights reserved.</p>
-          <p>Web design by Kifaru Car Hire</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link href="/terms" className="hover:text-white">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
+            <p>Website by Kifaru Websites</p>
+          </div>
         </div>
       </Container>
     </footer>

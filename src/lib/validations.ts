@@ -32,6 +32,45 @@ export type LoginFormState = {
   message?: string;
 };
 
+// Comma-separated free text (e.g. "Sunroof, Reverse camera, Leather seats")
+// parsed into a string array for the additional_features column.
+const FeaturesListField = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) =>
+    value
+      ? value
+          .split(",")
+          .map((f) => f.trim())
+          .filter(Boolean)
+      : []
+  );
+
+// Blank form fields arrive as "" from FormData — treat that as "not provided"
+// rather than coercing to 0, since these fields are genuinely optional.
+const OptionalMileageField = z.preprocess(
+  (value) => (value === "" || value === null || value === undefined ? undefined : value),
+  z.coerce.number().int().min(0).optional()
+);
+
+// A JSON-encoded array of URL strings (built client-side as gallery photos
+// are uploaded), capped at 9 so cover image + gallery = 10 images total.
+const GalleryUrlsField = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => {
+    if (!value) return [];
+    try {
+      const parsed = JSON.parse(value);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter((v): v is string => typeof v === "string").slice(0, 9);
+    } catch {
+      return [];
+    }
+  });
+
 export const VehicleSchema = z.object({
   name: z.string().trim().min(1, { error: "Name is required." }),
   make: z.string().trim().min(1, { error: "Make is required." }),
@@ -42,6 +81,16 @@ export const VehicleSchema = z.object({
   luggageCapacity: z.string().trim().min(1, { error: "Luggage capacity is required." }),
   imageUrl: z.string().trim().min(1, { error: "Image URL is required." }),
   isAvailable: z.coerce.boolean().optional(),
+  mileage: OptionalMileageField,
+  chassisNumber: z.string().trim().optional(),
+  registrationNumber: z.string().trim().optional(),
+  ownerName: z.string().trim().optional(),
+  ownerPhone: z.string().trim().optional(),
+  ownerEmail: z.string().trim().optional(),
+  additionalFeatures: FeaturesListField,
+  galleryUrls: GalleryUrlsField,
+  videoUrl: z.string().trim().optional(),
+  hoverSoundUrl: z.string().trim().optional(),
 });
 
 export type VehicleFormState = {
@@ -50,12 +99,40 @@ export type VehicleFormState = {
   message?: string;
 };
 
+export const VehicleApplicationSchema = z.object({
+  name: z.string().trim().min(1, { error: "Vehicle name is required." }),
+  make: z.string().trim().min(1, { error: "Make is required." }),
+  year: z.coerce.number().int().min(1990).max(2100),
+  transmission: z.enum(["Automatic", "Manual"]),
+  seats: z.coerce.number().int().min(1).max(60),
+  fuelType: z.string().trim().min(1, { error: "Fuel type is required." }),
+  luggageCapacity: z.string().trim().min(1, { error: "Luggage capacity is required." }),
+  mileage: OptionalMileageField,
+  chassisNumber: z.string().trim().optional(),
+  registrationNumber: z.string().trim().optional(),
+  additionalFeatures: FeaturesListField,
+  logbookPath: z.string().trim().optional(),
+  ownerName: z.string().trim().min(1, { error: "Your name is required." }),
+  ownerPhone: z.string().trim().min(7, { error: "Enter a valid phone number." }),
+  ownerEmail: z.email({ error: "Enter a valid email address." }).trim(),
+});
+
+export type VehicleApplicationFormState =
+  | { status: "idle" }
+  | {
+      status: "error";
+      errors: Partial<Record<keyof z.infer<typeof VehicleApplicationSchema>, string[]>>;
+      message?: string;
+    }
+  | { status: "success" };
+
 export const ReviewSchema = z.object({
   authorName: z.string().trim().min(1, { error: "Author name is required." }),
   rating: z.coerce.number().int().min(1).max(5),
   body: z.string().trim().min(1, { error: "Review body is required." }),
   daysAgoLabel: z.string().trim().optional(),
   isFeatured: z.coerce.boolean().optional(),
+  vehicleId: z.string().trim().optional(),
 });
 
 export type ReviewFormState = {

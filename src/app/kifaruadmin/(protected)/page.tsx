@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Car, MessageSquare, Star } from "lucide-react";
+import { Car, ClipboardList, MessageSquare, Star } from "lucide-react";
 import { getDashboardStats } from "@/lib/admin/data";
 
 export default async function AdminOverviewPage() {
@@ -12,6 +12,13 @@ export default async function AdminOverviewPage() {
       hint: "available / total",
       href: "/kifaruadmin/fleet",
       Icon: Car,
+    },
+    {
+      label: "Pending applications",
+      value: stats.pendingApplicationCount,
+      hint: `${stats.totalApplicationCount} total`,
+      href: "/kifaruadmin/applications",
+      Icon: ClipboardList,
     },
     {
       label: "New enquiries",
@@ -33,10 +40,10 @@ export default async function AdminOverviewPage() {
     <div>
       <h1 className="font-display text-2xl text-charcoal-950 dark:text-white">Overview</h1>
       <p className="mt-1 text-sm text-charcoal-500 dark:text-charcoal-400">
-        Manage your Prado fleet, enquiries and reviews shown on kifarucarhire.com.
+        Manage your Prado fleet, car-owner applications, enquiries and reviews shown on kifarucarhire.com.
       </p>
 
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map(({ label, value, hint, href, Icon }) => (
           <Link
             key={label}

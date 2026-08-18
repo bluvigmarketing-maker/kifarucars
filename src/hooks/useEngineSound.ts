@@ -32,11 +32,26 @@ if (typeof window !== "undefined") {
   window.addEventListener("keydown", resume, { once: true });
 }
 
-export function useEngineSound(enabled: boolean) {
+/**
+ * Hover sound for a vehicle card. If `customUrl` is set (an admin-uploaded
+ * per-vehicle sound file), plays that instead of the synthesized engine rev.
+ */
+export function useEngineSound(enabled: boolean, customUrl?: string | null) {
   const fadeOutRef = useRef<() => void>(() => {});
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const play = useCallback(() => {
     if (!enabled) return;
+
+    if (customUrl) {
+      if (!audioRef.current || audioRef.current.src !== customUrl) {
+        audioRef.current = new Audio(customUrl);
+      }
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+      return;
+    }
+
     const ctx = getContext();
     if (!ctx) return;
     if (ctx.state === "suspended") ctx.resume().catch(() => {});
@@ -92,13 +107,23 @@ export function useEngineSound(enabled: boolean) {
         // context may already be closed
       }
     };
-  }, [enabled]);
+  }, [enabled, customUrl]);
 
   const stop = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
     fadeOutRef.current();
   }, []);
 
-  useEffect(() => () => fadeOutRef.current(), []);
+  useEffect(
+    () => () => {
+      audioRef.current?.pause();
+      fadeOutRef.current();
+    },
+    []
+  );
 
   return { play, stop };
 }
