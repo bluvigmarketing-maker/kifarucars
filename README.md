@@ -36,13 +36,16 @@ that can't yet authenticate anyone.
    NEXT_PUBLIC_SUPABASE_ANON_KEY=
    ```
 3. Run the SQL files in `supabase/migrations/` **in order** (`0001`, `0002`,
-   `0003`, `0004`, `0005`, ...) via the Supabase SQL editor (or `supabase db push`
+   `0003`, `0004`, `0005`, `0006`, ...) via the Supabase SQL editor (or `supabase db push`
    if you're using the CLI). `0001_init.sql` creates `vehicles`, `enquiries`,
    `reviews`, and `profiles` with row-level security; `0004_vehicle_applications.sql`
    adds car-owner leasing applications, extended vehicle fields, and the
    private `logbooks` Storage bucket; `0005_vehicle_media.sql` adds the vehicle
    photo gallery, hover video/sound fields, per-vehicle reviews, and the public
-   `vehicle-images` / `vehicle-videos` / `vehicle-audio` Storage buckets.
+   `vehicle-images` / `vehicle-videos` / `vehicle-audio` Storage buckets;
+   `0006_client_portal.sql` adds the client portal — `clients`, `leases`,
+   `extension_requests`, and the token-based `get_portal_view` /
+   `request_lease_extension` functions used by `/portal/[token]`.
 4. `0002_seed_optional.sql` is optional — it seeds a handful of starter
    vehicles and reviews.
 5. Restart `npm run dev` so the new env vars are picked up.

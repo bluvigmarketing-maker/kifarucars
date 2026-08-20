@@ -84,12 +84,14 @@ Goal: the site becomes a portal where **car owners apply to have their vehicle l
 - [x] Public data access (`getVehicles`, `getVehicleForDetail` in `src/lib/data.ts`) explicitly selects a public-safe column list and maps placeholder data through `toPublicVehicle` — chassis/registration number, owner contact, and logbook path are never sent to the browser; **mileage is shown publicly** on the detail page (a deliberate call — common on real vehicle listings, unlike the other owner/document fields)
 - [ ] Verified with the dev server + curl against all 4 placeholder vehicles and an unknown id (404 as expected) — no live-browser console check was done (no browser automation tool available in this environment)
 
-## Milestone 11 — Client portal (registered lessees)
-- [ ] `clients` + `leases` tables: client contact info, linked vehicle, lease start/end date, cost, status (`active`/`ended`)
-- [ ] "Register as active client" flow, triggered by admin once a lease is confirmed — generates a unique, unguessable portal link/token (e.g. Supabase magic-link auth or a signed token URL) and (decide channel) emails/WhatsApps it to the client
-- [ ] Client portal route (e.g. `/portal/[token]` or authenticated `/portal`): shows lease cost, start/end date, remaining time
-- [ ] "Request extension" action on the portal → writes an `extension_requests` row; admin sees pending requests in `/kifaruadmin` and approves/declines (updates the lease end date on approval)
-- [ ] Decide auth model up front (see Notes below) before building — this is the highest-risk item to get wrong
+## Milestone 11 — Client portal (registered lessees) ✅
+- [x] `clients` + `leases` + `extension_requests` tables (`supabase/migrations/0006_client_portal.sql`): client contact info, linked vehicle, lease start/end date, cost, status (`active`/`ended`); RLS denies anon/authenticated entirely on all three (a bearer token isn't a Postgres role) — every token read/write instead goes through two narrowly-scoped `security definer` RPCs, `get_portal_view` and `request_lease_extension`
+- [x] "Register as active client" flow (`/kifaruadmin/leases/new`, `RegisterClientForm.tsx` → `registerClient` in `src/lib/actions/leases.ts`): creates the client + lease, mints a 256-bit token (`crypto.randomBytes`), stores only its sha256 hash (`leases.portal_token_hash`), and returns the raw link exactly once for the admin to copy and send manually via WhatsApp/email (decided: no automated email/WhatsApp-API integration — see Notes)
+- [x] Client portal route `/portal/[token]` (`src/lib/client-portal/dal.ts`'s `verifyClientToken`, force-dynamic, `noindex`): shows lease cost, start/end date, and remaining time, the latter always derived from dates at render time (`src/lib/client-portal/lease-status.ts`) rather than a stored/cron-updated field
+- [x] "Request extension" action (`ExtensionRequestForm.tsx` → `submitExtensionRequest`, authorized entirely by the RPC, no session) writes an `extension_requests` row; admin reviews pending requests at `/kifaruadmin/extension-requests` (`ExtensionRequestsTable.tsx`) and approve/decline updates the lease `end_date` on approval
+- [x] Admin can regenerate a lease's portal token (`regeneratePortalToken`), invalidating the old link — the closest thing to token revocation available in v1 (no expiry policy — see Notes)
+- [x] Decided (see Notes): token-in-URL auth, no login; admin copies/sends the link manually, no email/WhatsApp-API integration added
+- [ ] Connect the real Supabase project + run `0006_client_portal.sql` before this is live (see Milestone 4); end-to-end verified via `npm run build` (clean) and a dev-server smoke test with Supabase unconfigured (`/portal/<token>` 404s, `/kifaruadmin/leases` and `/kifaruadmin/extension-requests` redirect to login) — not yet verified against a live Supabase project (register → copy link → open portal → request extension → approve)
 
 ## Milestone 12 — QA & launch of the above
 - [ ] Responsive + dark-mode QA on all new pages/flows
@@ -100,6 +102,8 @@ Goal: the site becomes a portal where **car owners apply to have their vehicle l
 ---
 ### Notes / decisions needed before Milestones 8–11
 - **Client portal auth — DECIDED (2026-08-20): token link.** A long random token in the URL (`/portal/<token>`), no login required — lowest friction for clients; the link *is* the credential (must be transmitted and stored carefully, per the Privacy Policy §5 language already added).
+- **Client portal link delivery — DECIDED (2026-08-20): manual.** No email or WhatsApp-sending integration exists (or was added) — the admin copies the link from `/kifaruadmin/leases/new` (or after a regenerate) and sends it themselves. Revisit only if volume makes manual sending painful.
+- **Client portal token expiry — open, deferred.** v1 ships no expiry policy (not in the original requirement list, no cron infra to enforce one); "regenerate" is the only revoke path. Flag to the business if links should expire automatically after the lease ends.
 - **Video limits**: 50MB/60s should be checked both client-side (fast feedback, skip the upload) and server-side/in a Storage policy or edge function (can't trust the client alone).
 - **Chassis/registration number**: recommend staff-only visibility by default; confirm with the business whether these should ever be public on a vehicle detail page.
 

@@ -1,6 +1,15 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { Enquiry, Review, Vehicle, VehicleApplication } from "@/lib/types";
+import type {
+  Enquiry,
+  ExtensionRequestWithLease,
+  LeaseWithRelations,
+  Review,
+  Vehicle,
+  VehicleApplication,
+} from "@/lib/types";
+
+const LEASE_RELATIONS_SELECT = "*, client:clients(*), vehicle:vehicles(id, name, make, year, image_url)";
 
 export async function listAllVehicles(): Promise<Vehicle[]> {
   const supabase = await createClient();
@@ -60,12 +69,52 @@ export async function getApplicationById(id: string): Promise<VehicleApplication
   return (data as VehicleApplication) ?? null;
 }
 
+export async function listAllLeases(): Promise<LeaseWithRelations[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("leases")
+    .select(LEASE_RELATIONS_SELECT)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as unknown as LeaseWithRelations[];
+}
+
+export async function getLeaseById(id: string): Promise<LeaseWithRelations | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("leases")
+    .select(LEASE_RELATIONS_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+  return (data as unknown as LeaseWithRelations) ?? null;
+}
+
+export async function listAllExtensionRequests(): Promise<ExtensionRequestWithLease[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("extension_requests")
+    .select(`*, lease:leases(${LEASE_RELATIONS_SELECT})`)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as unknown as ExtensionRequestWithLease[];
+}
+
+export async function getExtensionRequestById(id: string): Promise<ExtensionRequestWithLease | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("extension_requests")
+    .select(`*, lease:leases(${LEASE_RELATIONS_SELECT})`)
+    .eq("id", id)
+    .maybeSingle();
+  return (data as unknown as ExtensionRequestWithLease) ?? null;
+}
+
 export async function getDashboardStats() {
-  const [vehicles, enquiries, reviews, applications] = await Promise.all([
+  const [vehicles, enquiries, reviews, applications, leases, extensionRequests] = await Promise.all([
     listAllVehicles(),
     listAllEnquiries(),
     listAllReviews(),
     listAllApplications(),
+    listAllLeases(),
+    listAllExtensionRequests(),
   ]);
 
   return {
@@ -76,5 +125,8 @@ export async function getDashboardStats() {
     reviewCount: reviews.length,
     pendingApplicationCount: applications.filter((a) => a.status === "pending").length,
     totalApplicationCount: applications.length,
+    activeLeaseCount: leases.filter((l) => l.status === "active").length,
+    totalLeaseCount: leases.length,
+    pendingExtensionRequestCount: extensionRequests.filter((r) => r.status === "pending").length,
   };
 }

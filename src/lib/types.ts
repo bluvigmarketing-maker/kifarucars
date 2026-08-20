@@ -92,3 +92,68 @@ export type AdminProfile = {
   full_name: string | null;
   role: "admin" | "staff";
 };
+
+export type Client = {
+  id: string;
+  full_name: string;
+  phone: string;
+  email: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+export type LeaseStatus = "active" | "ended";
+
+export type Lease = {
+  id: string;
+  client_id: string;
+  vehicle_id: string;
+  start_date: string;
+  end_date: string;
+  cost: number;
+  status: LeaseStatus;
+  admin_notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // portal_token_hash intentionally omitted — write-only from app code
+  // (set on registration, overwritten on regenerate), never read back as a
+  // value; only ever compared inside the SQL functions in
+  // supabase/migrations/0006_client_portal.sql.
+};
+
+export type LeaseWithRelations = Lease & {
+  client: Client;
+  vehicle: Pick<Vehicle, "id" | "name" | "make" | "year" | "image_url">;
+};
+
+export type ExtensionRequestStatus = "pending" | "approved" | "declined";
+
+export type ExtensionRequest = {
+  id: string;
+  lease_id: string;
+  requested_end_date: string;
+  reason: string | null;
+  status: ExtensionRequestStatus;
+  admin_notes: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+};
+
+export type ExtensionRequestWithLease = ExtensionRequest & { lease: LeaseWithRelations };
+
+// What /portal/[token] receives via the get_portal_view RPC — never a raw
+// table select. Excludes client phone/email, admin_notes, and the token
+// hash: the portal only ever shows lease facts back to whoever holds the link.
+export type ClientPortalView = {
+  leaseId: string;
+  clientFirstName: string;
+  vehicleName: string;
+  vehicleMake: string;
+  vehicleYear: number;
+  vehicleImageUrl: string;
+  startDate: string;
+  endDate: string;
+  cost: number;
+  status: LeaseStatus;
+  hasPendingExtensionRequest: boolean;
+};

@@ -140,3 +140,42 @@ export type ReviewFormState = {
   errors?: Partial<Record<keyof z.infer<typeof ReviewSchema>, string[]>>;
   message?: string;
 };
+
+export const RegisterClientSchema = z
+  .object({
+    fullName: z.string().trim().min(1, { error: "Client name is required." }),
+    phone: z.string().trim().min(7, { error: "Enter a valid phone number." }),
+    email: z.email({ error: "Enter a valid email address." }).trim().optional().or(z.literal("")),
+    vehicleId: z.string().trim().min(1, { error: "Select a vehicle." }),
+    startDate: z.string().trim().min(1, { error: "Start date is required." }),
+    endDate: z.string().trim().min(1, { error: "End date is required." }),
+    cost: z.coerce.number().min(0, { error: "Enter a valid cost." }),
+    notes: z.string().trim().optional(),
+  })
+  .refine((v) => v.endDate >= v.startDate, {
+    error: "End date must be on or after the start date.",
+    path: ["endDate"],
+  });
+
+export type RegisterClientFormState =
+  | { status: "idle" }
+  | {
+      status: "error";
+      errors?: Partial<Record<keyof z.infer<typeof RegisterClientSchema>, string[]>>;
+      message?: string;
+    }
+  | { status: "success"; portalUrl: string };
+
+// Portal-side: submitted with the raw token as a hidden field, but the
+// request_lease_extension RPC (see supabase/migrations/0006_client_portal.sql)
+// is the real authority — this schema is just fast client-visible feedback.
+export const ExtensionRequestSchema = z.object({
+  token: z.string().trim().min(20, { error: "Invalid link." }),
+  requestedEndDate: z.string().trim().min(1, { error: "Pick a new end date." }),
+  reason: z.string().trim().optional(),
+});
+
+export type ExtensionRequestFormState =
+  | { status: "idle" }
+  | { status: "error"; message?: string }
+  | { status: "success" };

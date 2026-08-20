@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Car, ClipboardList, MessageSquare, Star } from "lucide-react";
+import { Car, ClipboardList, FileClock, Hourglass, MessageSquare, Star } from "lucide-react";
 import { getDashboardStats } from "@/lib/admin/data";
 
 export default async function AdminOverviewPage() {
@@ -19,6 +19,20 @@ export default async function AdminOverviewPage() {
       hint: `${stats.totalApplicationCount} total`,
       href: "/kifaruadmin/applications",
       Icon: ClipboardList,
+    },
+    {
+      label: "Active leases",
+      value: stats.activeLeaseCount,
+      hint: `${stats.totalLeaseCount} total`,
+      href: "/kifaruadmin/leases",
+      Icon: FileClock,
+    },
+    {
+      label: "Pending extensions",
+      value: stats.pendingExtensionRequestCount,
+      hint: "requested by clients",
+      href: "/kifaruadmin/extension-requests",
+      Icon: Hourglass,
     },
     {
       label: "New enquiries",
