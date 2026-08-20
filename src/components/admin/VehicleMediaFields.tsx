@@ -56,10 +56,15 @@ export function CoverImageField({
             if (!file) return;
             setUploading(true);
             setUploadError("");
-            const result = await uploadVehicleImage(file);
-            setUploading(false);
-            if ("error" in result) setUploadError(result.error);
-            else setValue(result.url);
+            try {
+              const result = await uploadVehicleImage(file);
+              if ("error" in result) setUploadError(result.error);
+              else setValue(result.url);
+            } catch {
+              setUploadError("Upload failed. Please try again.");
+            } finally {
+              setUploading(false);
+            }
           }}
         />
       </div>
@@ -128,15 +133,20 @@ export function GalleryUploadField({ defaultValue }: { defaultValue?: string[] }
             if (files.length === 0) return;
             setUploading(true);
             setError("");
-            for (const file of files) {
-              const result = await uploadVehicleImage(file);
-              if ("error" in result) {
-                setError(result.error);
-              } else {
-                setUrls((prev) => (prev.length < GALLERY_MAX ? [...prev, result.url] : prev));
+            try {
+              for (const file of files) {
+                const result = await uploadVehicleImage(file);
+                if ("error" in result) {
+                  setError(result.error);
+                } else {
+                  setUrls((prev) => (prev.length < GALLERY_MAX ? [...prev, result.url] : prev));
+                }
               }
+            } catch {
+              setError("Upload failed. Please try again.");
+            } finally {
+              setUploading(false);
             }
-            setUploading(false);
           }}
         />
       </div>
@@ -178,10 +188,15 @@ export function VideoUploadField({ defaultValue }: { defaultValue?: string | nul
             if (!file) return;
             setUploading(true);
             setError("");
-            const result = await uploadVehicleVideo(file);
-            setUploading(false);
-            if ("error" in result) setError(result.error);
-            else setUrl(result.url);
+            try {
+              const result = await uploadVehicleVideo(file);
+              if ("error" in result) setError(result.error);
+              else setUrl(result.url);
+            } catch {
+              setError("Upload failed. Please try again.");
+            } finally {
+              setUploading(false);
+            }
           }}
         />
         {url ? (
@@ -233,10 +248,15 @@ export function HoverSoundUploadField({ defaultValue }: { defaultValue?: string 
             if (!file) return;
             setUploading(true);
             setError("");
-            const result = await uploadVehicleHoverSound(file);
-            setUploading(false);
-            if ("error" in result) setError(result.error);
-            else setUrl(result.url);
+            try {
+              const result = await uploadVehicleHoverSound(file);
+              if ("error" in result) setError(result.error);
+              else setUrl(result.url);
+            } catch {
+              setError("Upload failed. Please try again.");
+            } finally {
+              setUploading(false);
+            }
           }}
         />
         {url ? (

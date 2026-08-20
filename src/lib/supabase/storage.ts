@@ -1,4 +1,8 @@
 import { createClient } from "./client";
+import { isSupabaseConfigured } from "./env";
+
+const NOT_CONFIGURED_ERROR =
+  "Uploads aren't connected yet — Supabase isn't configured for this site (see README).";
 
 const MAX_LOGBOOK_SIZE_BYTES = 10 * 1024 * 1024; // 10MB, matches the bucket's file_size_limit
 const ALLOWED_LOGBOOK_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -18,18 +22,23 @@ export async function uploadLogbookFile(
   if (file.size > MAX_LOGBOOK_SIZE_BYTES) {
     return { error: "Logbook file must be 10MB or smaller." };
   }
+  if (!isSupabaseConfigured) return { error: NOT_CONFIGURED_ERROR };
 
-  const supabase = createClient();
-  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-  const path = `applications/${crypto.randomUUID()}-${safeName}`;
+  try {
+    const supabase = createClient();
+    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    const path = `applications/${crypto.randomUUID()}-${safeName}`;
 
-  const { error } = await supabase.storage.from("logbooks").upload(path, file, {
-    contentType: file.type,
-    upsert: false,
-  });
+    const { error } = await supabase.storage.from("logbooks").upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
 
-  if (error) return { error: "Could not upload logbook. Please try again." };
-  return { path };
+    if (error) return { error: "Could not upload logbook. Please try again." };
+    return { path };
+  } catch {
+    return { error: "Could not upload logbook. Please try again." };
+  }
 }
 
 const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB, matches vehicle-images bucket limit
@@ -51,18 +60,24 @@ async function uploadPublicFile(
   folder: string,
   file: File
 ): Promise<{ url: string } | { error: string }> {
-  const supabase = createClient();
-  const path = `${folder}/${crypto.randomUUID()}-${safeFileName(file)}`;
+  if (!isSupabaseConfigured) return { error: NOT_CONFIGURED_ERROR };
 
-  const { error } = await supabase.storage.from(bucket).upload(path, file, {
-    contentType: file.type,
-    upsert: false,
-  });
+  try {
+    const supabase = createClient();
+    const path = `${folder}/${crypto.randomUUID()}-${safeFileName(file)}`;
 
-  if (error) return { error: "Upload failed. Please try again." };
+    const { error } = await supabase.storage.from(bucket).upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-  return { url: data.publicUrl };
+    if (error) return { error: "Upload failed. Please try again." };
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+    return { url: data.publicUrl };
+  } catch {
+    return { error: "Upload failed. Please try again." };
+  }
 }
 
 /** Uploads a vehicle gallery/cover photo to the public `vehicle-images` bucket. */

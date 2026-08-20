@@ -64,14 +64,20 @@ function LogbookUpload({ errors }: { errors?: Partial<Record<string, string[]>> 
             setFileName(file.name);
             setStatus("uploading");
             setError("");
-            const result = await uploadLogbookFile(file);
-            if ("error" in result) {
+            try {
+              const result = await uploadLogbookFile(file);
+              if ("error" in result) {
+                setStatus("error");
+                setError(result.error);
+                setPath("");
+              } else {
+                setStatus("done");
+                setPath(result.path);
+              }
+            } catch {
               setStatus("error");
-              setError(result.error);
+              setError("Upload failed. Please try again.");
               setPath("");
-            } else {
-              setStatus("done");
-              setPath(result.path);
             }
           }}
         />
