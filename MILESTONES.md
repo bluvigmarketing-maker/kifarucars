@@ -99,7 +99,7 @@ Goal: the site becomes a portal where **car owners apply to have their vehicle l
 
 ---
 ### Notes / decisions needed before Milestones 8–11
-- **Client portal auth**: simplest to build is a long random token in the URL (`/portal/<token>`), no login required — lowest friction for clients but the link *is* the credential (must be transmitted and stored carefully, per the Privacy Policy §5 language already added). Alternative is real Supabase-Auth accounts per client (more secure, more setup/friction). Pick one before starting Milestone 11.
+- **Client portal auth — DECIDED (2026-08-20): token link.** A long random token in the URL (`/portal/<token>`), no login required — lowest friction for clients; the link *is* the credential (must be transmitted and stored carefully, per the Privacy Policy §5 language already added).
 - **Video limits**: 50MB/60s should be checked both client-side (fast feedback, skip the upload) and server-side/in a Storage policy or edge function (can't trust the client alone).
 - **Chassis/registration number**: recommend staff-only visibility by default; confirm with the business whether these should ever be public on a vehicle detail page.
 
