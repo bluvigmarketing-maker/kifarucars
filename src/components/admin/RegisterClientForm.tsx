@@ -66,7 +66,7 @@ function PortalLinkPanel({ portalUrl }: { portalUrl: string }) {
         </div>
         <div className="mt-4">
           <Button href="/kifaruadmin/leases" variant="outline" size="sm">
-            Back to Leases
+            Back to Lease Records
           </Button>
         </div>
       </div>

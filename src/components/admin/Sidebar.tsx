@@ -20,7 +20,7 @@ export const NAV_ITEMS = [
   { label: "Overview", href: "/kifaruadmin", Icon: LayoutDashboard },
   { label: "Fleet", href: "/kifaruadmin/fleet", Icon: Car },
   { label: "Applications", href: "/kifaruadmin/applications", Icon: ClipboardList },
-  { label: "Leases", href: "/kifaruadmin/leases", Icon: FileClock },
+  { label: "Lease records", href: "/kifaruadmin/leases", Icon: FileClock },
   { label: "Extensions", href: "/kifaruadmin/extension-requests", Icon: Hourglass },
   { label: "Enquiries", href: "/kifaruadmin/enquiries", Icon: MessageSquare },
   { label: "Reviews", href: "/kifaruadmin/reviews", Icon: Star },
