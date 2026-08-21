@@ -13,8 +13,8 @@ export const BUSINESS = {
   driverCount: "15", // PLACEHOLDER
   googleRating: 4.8, // PLACEHOLDER
   googleReviewCount: 120, // PLACEHOLDER
-  phone: "+254 700 000 000", // PLACEHOLDER
-  whatsapp: "254700000000", // PLACEHOLDER (no leading +, for wa.me links)
+  phone: "+254 721 478 316",
+  whatsapp: "254721478316", // no leading +, for wa.me links
   email: "info@kifarucarhire.example", // PLACEHOLDER
   locations: ["Nairobi", "Kisumu", "Mombasa", "Nanyuki", "Nakuru"],
 };
