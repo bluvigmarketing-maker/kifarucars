@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const NAV_LINKS = [
+  { label: "Home", href: "/" },
   { label: "Corporate Car Hire", href: "#services" },
   { label: "Corporate Leasing", href: "#services" },
   { label: "Expat Car Hire", href: "#services" },
