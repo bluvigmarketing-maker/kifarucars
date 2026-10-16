@@ -9,14 +9,14 @@ import "server-only";
 // belongs to that store number. Sandbox only supports the 174379 paybill, so
 // sandbox mode switches to CustomerPayBillOnline with PartyB = shortcode.
 
-const env = process.env.MPESA_ENV === "production" ? "production" : "sandbox";
-const BASE_URL = env === "production" ? "https://api.safaricom.co.ke" : "https://sandbox.safaricom.co.ke";
-
 // Dashboard-pasted env values often carry stray quotes or whitespace, which
 // silently break Daraja auth — strip both.
 function envValue(name: string) {
   return process.env[name]?.trim().replace(/^["']|["']$/g, "").trim() || undefined;
 }
+
+const env = envValue("MPESA_ENV")?.toLowerCase() === "production" ? "production" : "sandbox";
+const BASE_URL = env === "production" ? "https://api.safaricom.co.ke" : "https://sandbox.safaricom.co.ke";
 
 const consumerKey = envValue("MPESA_CONSUMER_KEY");
 const consumerSecret = envValue("MPESA_CONSUMER_SECRET");
@@ -67,7 +67,10 @@ async function getAccessToken(): Promise<string> {
   });
   if (!res.ok) {
     const detail = (await res.text().catch(() => "")).slice(0, 200);
-    throw new Error(`Daraja auth failed (${res.status}) ${detail}`.trim());
+    // Key prefix (never the full key) + env make a credentials mix-up obvious.
+    throw new Error(
+      `Daraja ${env} auth failed (${res.status}) key ${consumerKey?.slice(0, 4)}… ${detail}`.trim()
+    );
   }
   const data = (await res.json()) as { access_token: string; expires_in: string };
 
