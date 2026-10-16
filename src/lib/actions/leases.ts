@@ -82,8 +82,9 @@ export async function endLease(leaseId: string) {
   revalidatePath("/kifaruadmin/leases");
 }
 
-export async function approveExtensionRequest(id: string) {
+export async function approveExtensionRequest(id: string, amount?: number) {
   await verifyAdmin();
+  const charge = amount !== undefined && Number.isFinite(amount) && amount >= 0 ? amount : null;
   const supabase = await createClient();
 
   const { data: request } = await supabase
@@ -101,7 +102,7 @@ export async function approveExtensionRequest(id: string) {
 
   await supabase
     .from("extension_requests")
-    .update({ status: "approved", reviewed_at: new Date().toISOString() })
+    .update({ status: "approved", amount: charge, reviewed_at: new Date().toISOString() })
     .eq("id", id);
 
   revalidatePath("/kifaruadmin/leases");

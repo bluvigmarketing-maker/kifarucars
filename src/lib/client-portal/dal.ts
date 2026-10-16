@@ -22,6 +22,8 @@ type PortalViewRow = {
   cost: number;
   status: ClientPortalView["status"];
   has_pending_extension_request: boolean;
+  extension_charges: number;
+  amount_paid: number;
 };
 
 /**
@@ -53,5 +55,8 @@ export const verifyClientToken = cache(async (token: string): Promise<ClientPort
     cost: data.cost,
     status: data.status,
     hasPendingExtensionRequest: data.has_pending_extension_request,
+    // numeric columns can arrive as strings from PostgREST.
+    extensionCharges: Number(data.extension_charges),
+    amountPaid: Number(data.amount_paid),
   };
 });

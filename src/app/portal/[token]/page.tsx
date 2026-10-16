@@ -4,6 +4,10 @@ import { CalendarDays, Wallet } from "lucide-react";
 import { verifyClientToken } from "@/lib/client-portal/dal";
 import { getLeaseDisplayStatus, getRemainingDays, type LeaseDisplayStatus } from "@/lib/client-portal/lease-status";
 import { ExtensionRequestForm } from "@/components/portal/ExtensionRequestForm";
+import { PaymentPanel } from "@/components/portal/PaymentPanel";
+import { formatKes, getLeaseBalance } from "@/lib/payments/balance";
+import { isMpesaConfigured, TILL_NAME, TILL_NUMBER } from "@/lib/mpesa/daraja";
+import { isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { cn } from "@/lib/cn";
 
 // Per-token data, never prerenderable — same reasoning as /kifaruadmin/**.
@@ -34,6 +38,7 @@ export default async function ClientPortalPage({ params }: PageProps<"/portal/[t
 
   const remainingDays = getRemainingDays(view.endDate);
   const displayStatus = getLeaseDisplayStatus(view.status, view.endDate);
+  const { totalDue, paid, balance } = getLeaseBalance(view.cost, view.extensionCharges, view.amountPaid);
 
   let extensionDisabledReason: string | undefined;
   if (view.status === "ended") {
@@ -84,7 +89,7 @@ export default async function ClientPortalPage({ params }: PageProps<"/portal/[t
               <div>
                 <dt className="text-xs text-charcoal-500 dark:text-charcoal-400">Cost</dt>
                 <dd className="text-sm font-medium text-charcoal-900 dark:text-white">
-                  {view.cost.toLocaleString()}
+                  {formatKes(view.cost)}
                 </dd>
               </div>
             </div>
@@ -97,6 +102,22 @@ export default async function ClientPortalPage({ params }: PageProps<"/portal/[t
                 : `${Math.abs(remainingDays)} day${Math.abs(remainingDays) === 1 ? "" : "s"} overdue.`}
             </p>
           ) : null}
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="font-display text-xl text-charcoal-950 dark:text-white">Payments</h2>
+        <div className="mt-4">
+          <PaymentPanel
+            token={token}
+            totalDue={totalDue}
+            paid={paid}
+            balance={balance}
+            extensionCharges={view.extensionCharges}
+            tillNumber={TILL_NUMBER}
+            tillName={TILL_NAME}
+            onlineEnabled={isMpesaConfigured && isServiceRoleConfigured}
+          />
         </div>
       </div>
 

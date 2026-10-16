@@ -45,7 +45,9 @@ that can't yet authenticate anyone.
    `vehicle-images` / `vehicle-videos` / `vehicle-audio` Storage buckets;
    `0006_client_portal.sql` adds the client portal — `clients`, `leases`,
    `extension_requests`, and the token-based `get_portal_view` /
-   `request_lease_extension` functions used by `/portal/[token]`.
+   `request_lease_extension` functions used by `/portal/[token]`;
+   `0007_mpesa_payments.sql` adds M-Pesa `payments` and lease balances
+   (STK Push setup: see the `MPESA_*` section of `.env.example`).
 4. `0002_seed_optional.sql` is optional — it seeds a handful of starter
    vehicles and reviews.
 5. Restart `npm run dev` so the new env vars are picked up.

@@ -5,7 +5,8 @@ import { Copy, RefreshCw, Square } from "lucide-react";
 import { endLease, regeneratePortalToken } from "@/lib/actions/leases";
 import { getLeaseDisplayStatus, getRemainingDays, type LeaseDisplayStatus } from "@/lib/client-portal/lease-status";
 import { cn } from "@/lib/cn";
-import type { LeaseWithRelations } from "@/lib/types";
+import { formatKes, getLeaseBalanceFromRelations } from "@/lib/payments/balance";
+import type { LeaseWithBalance } from "@/lib/types";
 
 const STATUS_STYLES: Record<LeaseDisplayStatus, string> = {
   active: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400",
@@ -21,7 +22,7 @@ const STATUS_LABELS: Record<LeaseDisplayStatus, string> = {
   ended: "Ended",
 };
 
-export function LeasesTable({ leases }: { leases: LeaseWithRelations[] }) {
+export function LeasesTable({ leases }: { leases: LeaseWithBalance[] }) {
   const [isPending, startTransition] = useTransition();
   const [revealedLinks, setRevealedLinks] = useState<Record<string, string>>({});
 
@@ -59,7 +60,7 @@ export function LeasesTable({ leases }: { leases: LeaseWithRelations[] }) {
               <th className="px-5 py-3">Vehicle</th>
               <th className="px-5 py-3">Lease dates</th>
               <th className="px-5 py-3">Remaining</th>
-              <th className="px-5 py-3">Cost</th>
+              <th className="px-5 py-3">Due / Paid</th>
               <th className="px-5 py-3">Status</th>
               <th className="px-5 py-3 text-right">Actions</th>
             </tr>
@@ -68,6 +69,7 @@ export function LeasesTable({ leases }: { leases: LeaseWithRelations[] }) {
             {leases.map((lease) => {
               const displayStatus = getLeaseDisplayStatus(lease.status, lease.end_date);
               const remaining = getRemainingDays(lease.end_date);
+              const { totalDue, paid, balance } = getLeaseBalanceFromRelations(lease);
               return (
                 <tr key={lease.id}>
                   <td className="px-5 py-3.5">
@@ -84,7 +86,17 @@ export function LeasesTable({ leases }: { leases: LeaseWithRelations[] }) {
                     {lease.status === "ended" ? "—" : `${remaining} day${remaining === 1 ? "" : "s"}`}
                   </td>
                   <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">
-                    {lease.cost.toLocaleString()}
+                    <p>{formatKes(totalDue)}</p>
+                    <p
+                      className={cn(
+                        "text-xs",
+                        balance > 0
+                          ? "text-burgundy-600 dark:text-burgundy-400"
+                          : "text-green-700 dark:text-green-400"
+                      )}
+                    >
+                      {balance > 0 ? `${formatKes(paid)} paid · ${formatKes(balance)} due` : "Fully paid"}
+                    </p>
                   </td>
                   <td className="px-5 py-3.5">
                     <span

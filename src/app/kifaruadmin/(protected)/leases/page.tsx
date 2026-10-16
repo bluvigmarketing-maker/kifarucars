@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { LeasesTable } from "@/components/admin/LeasesTable";
 import { listAllLeases } from "@/lib/admin/data";
 import { getLeaseDisplayStatus } from "@/lib/client-portal/lease-status";
+import { formatKes, getLeaseBalanceFromRelations } from "@/lib/payments/balance";
 
 export default async function AdminLeasesPage() {
   const leases = await listAllLeases();
@@ -13,7 +14,10 @@ export default async function AdminLeasesPage() {
   ).length;
   const overdueCount = leases.filter((l) => getLeaseDisplayStatus(l.status, l.end_date) === "overdue").length;
   const endedCount = leases.filter((l) => l.status === "ended").length;
-  const totalRevenue = leases.reduce((sum, l) => sum + l.cost, 0);
+  const balances = leases.map(getLeaseBalanceFromRelations);
+  const totalValue = balances.reduce((sum, b) => sum + b.totalDue, 0);
+  const totalCollected = balances.reduce((sum, b) => sum + b.paid, 0);
+  const totalOutstanding = balances.reduce((sum, b) => sum + b.balance, 0);
 
   const stats = [
     { label: "Total records", value: leases.length },
@@ -21,7 +25,9 @@ export default async function AdminLeasesPage() {
     { label: "Ending soon", value: endingSoonCount },
     { label: "Overdue", value: overdueCount },
     { label: "Ended", value: endedCount },
-    { label: "Total value", value: totalRevenue.toLocaleString() },
+    { label: "Total value", value: formatKes(totalValue) },
+    { label: "Collected", value: formatKes(totalCollected) },
+    { label: "Outstanding", value: formatKes(totalOutstanding) },
   ];
 
   return (
@@ -38,14 +44,14 @@ export default async function AdminLeasesPage() {
         </Button>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map(({ label, value }) => (
           <div
             key={label}
             className="rounded-2xl border-2 border-gold-500/60 bg-white p-4 shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900"
           >
             <p className="text-xs text-charcoal-500 dark:text-charcoal-400">{label}</p>
-            <p className="mt-1 font-display text-2xl text-charcoal-950 dark:text-white">{value}</p>
+            <p className="mt-1 font-display text-xl text-charcoal-950 dark:text-white">{value}</p>
           </div>
         ))}
       </div>

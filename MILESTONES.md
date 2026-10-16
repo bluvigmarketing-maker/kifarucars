@@ -99,6 +99,17 @@ Goal: the site becomes a portal where **car owners apply to have their vehicle l
 - [ ] Storage bucket size/type limits verified against Supabase plan (video storage costs more than the placeholder SVGs currently in `public/vehicles/`)
 - [ ] End-to-end pass: owner applies → admin approves → vehicle live with gallery/video/sound → client leases → client registered → client requests extension → admin approves
 
+## Milestone 13 — M-Pesa payments (STK Push to till 8999944, Top Dollars Ltd)
+- [x] `supabase/migrations/0007_mpesa_payments.sql`: `payments` table (staff read-only RLS, written server-side with the service-role key), `extension_requests.amount`, balance fields on `get_portal_view`
+- [x] Daraja client (`src/lib/mpesa/daraja.ts`): OAuth, STK Push (`CustomerBuyGoodsOnline`, PartyB = till), STK Query fallback
+- [x] Portal "Payments" panel (`PaymentPanel.tsx` → `src/lib/actions/payments.ts`): balance = lease cost + approved extension charges − paid; client enters phone + amount (partial payments allowed), gets the PIN prompt, page polls until settled. Falls back to showing the till number when M-Pesa env vars aren't set
+- [x] Callback route `/api/payments/callback/[secret]` (secret path segment, since Daraja doesn't sign callbacks; path avoids "mpesa" because Daraja rejects such URLs)
+- [x] Admin: charge amount when approving an extension; Due/Paid/Balance on Lease Records; `/kifaruadmin/payments` list
+- [ ] Run `0007_mpesa_payments.sql`; set `SUPABASE_SERVICE_ROLE_KEY` + `MPESA_*` env vars (see `.env.example`)
+- [ ] Test end-to-end in Daraja sandbox (needs a public callback URL — Vercel preview or ngrok)
+- [ ] Daraja go-live for till 8999944 → production store number + passkey, switch `MPESA_ENV=production`, test with a real KES 1 payment
+- [ ] Update the Privacy Policy to mention M-Pesa phone numbers and payment records
+
 ---
 ### Notes / decisions needed before Milestones 8–11
 - **Client portal auth — DECIDED (2026-08-20): token link.** A long random token in the URL (`/portal/<token>`), no login required — lowest friction for clients; the link *is* the credential (must be transmitted and stored carefully, per the Privacy Policy §5 language already added).

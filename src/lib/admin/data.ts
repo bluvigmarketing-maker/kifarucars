@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import type {
   Enquiry,
   ExtensionRequestWithLease,
+  LeaseWithBalance,
   LeaseWithRelations,
+  PaymentWithLease,
   Review,
   Vehicle,
   VehicleApplication,
@@ -69,13 +71,22 @@ export async function getApplicationById(id: string): Promise<VehicleApplication
   return (data as VehicleApplication) ?? null;
 }
 
-export async function listAllLeases(): Promise<LeaseWithRelations[]> {
+export async function listAllLeases(): Promise<LeaseWithBalance[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("leases")
-    .select(LEASE_RELATIONS_SELECT)
+    .select(`${LEASE_RELATIONS_SELECT}, extension_requests(amount, status), payments(amount, status)`)
     .order("created_at", { ascending: false });
-  return (data ?? []) as unknown as LeaseWithRelations[];
+  return (data ?? []) as unknown as LeaseWithBalance[];
+}
+
+export async function listAllPayments(): Promise<PaymentWithLease[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("payments")
+    .select(`*, lease:leases(${LEASE_RELATIONS_SELECT})`)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as unknown as PaymentWithLease[];
 }
 
 export async function getLeaseById(id: string): Promise<LeaseWithRelations | null> {

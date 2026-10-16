@@ -179,3 +179,17 @@ export type ExtensionRequestFormState =
   | { status: "idle" }
   | { status: "error"; message?: string }
   | { status: "success" };
+
+// Portal-side M-Pesa payment. Whole shillings only — M-Pesa doesn't take
+// cents. The upper bound against the actual balance is checked server-side
+// in src/lib/actions/payments.ts.
+export const PaymentSchema = z.object({
+  token: z.string().trim().min(20, { error: "Invalid link." }),
+  phone: z.string().trim().min(9, { error: "Enter your M-Pesa phone number." }),
+  amount: z.coerce.number().int({ error: "Enter a whole amount in KES." }).min(1, { error: "Enter an amount." }),
+});
+
+export type PaymentFormState =
+  | { status: "idle" }
+  | { status: "error"; message: string }
+  | { status: "sent"; paymentId: string };

@@ -134,12 +134,41 @@ export type ExtensionRequest = {
   requested_end_date: string;
   reason: string | null;
   status: ExtensionRequestStatus;
+  // Charge for the extra days, set by the admin on approval.
+  amount: number | null;
   admin_notes: string | null;
   reviewed_at: string | null;
   created_at: string;
 };
 
 export type ExtensionRequestWithLease = ExtensionRequest & { lease: LeaseWithRelations };
+
+export type PaymentStatus = "pending" | "paid" | "failed" | "cancelled";
+
+// One M-Pesa STK Push attempt against a lease balance (till 8999944).
+export type Payment = {
+  id: string;
+  lease_id: string;
+  amount: number;
+  phone: string;
+  status: PaymentStatus;
+  merchant_request_id: string | null;
+  checkout_request_id: string | null;
+  mpesa_receipt: string | null;
+  result_code: number | null;
+  result_desc: string | null;
+  paid_at: string | null;
+  created_at: string;
+};
+
+export type PaymentWithLease = Payment & { lease: LeaseWithRelations };
+
+// Lease Records list: a lease plus just enough of its extensions/payments
+// to compute total due and balance.
+export type LeaseWithBalance = LeaseWithRelations & {
+  extension_requests: Pick<ExtensionRequest, "amount" | "status">[];
+  payments: Pick<Payment, "amount" | "status">[];
+};
 
 // What /portal/[token] receives via the get_portal_view RPC — never a raw
 // table select. Excludes client phone/email, admin_notes, and the token
@@ -156,4 +185,6 @@ export type ClientPortalView = {
   cost: number;
   status: LeaseStatus;
   hasPendingExtensionRequest: boolean;
+  extensionCharges: number;
+  amountPaid: number;
 };

@@ -11,6 +11,7 @@ import {
   LogOut,
   MessageSquare,
   Star,
+  Wallet,
 } from "lucide-react";
 import { logout } from "@/lib/actions/admin-auth";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -22,6 +23,7 @@ export const NAV_ITEMS = [
   { label: "Applications", href: "/kifaruadmin/applications", Icon: ClipboardList },
   { label: "Lease records", href: "/kifaruadmin/leases", Icon: FileClock },
   { label: "Extensions", href: "/kifaruadmin/extension-requests", Icon: Hourglass },
+  { label: "Payments", href: "/kifaruadmin/payments", Icon: Wallet },
   { label: "Enquiries", href: "/kifaruadmin/enquiries", Icon: MessageSquare },
   { label: "Reviews", href: "/kifaruadmin/reviews", Icon: Star },
 ];
