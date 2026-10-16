@@ -12,14 +12,20 @@ import "server-only";
 const env = process.env.MPESA_ENV === "production" ? "production" : "sandbox";
 const BASE_URL = env === "production" ? "https://api.safaricom.co.ke" : "https://sandbox.safaricom.co.ke";
 
-const consumerKey = process.env.MPESA_CONSUMER_KEY;
-const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
-const shortcode = process.env.MPESA_SHORTCODE;
-const passkey = process.env.MPESA_PASSKEY;
-const callbackBaseUrl = process.env.MPESA_CALLBACK_BASE_URL;
-const callbackSecret = process.env.MPESA_CALLBACK_SECRET;
+// Dashboard-pasted env values often carry stray quotes or whitespace, which
+// silently break Daraja auth — strip both.
+function envValue(name: string) {
+  return process.env[name]?.trim().replace(/^["']|["']$/g, "").trim() || undefined;
+}
 
-export const TILL_NUMBER = process.env.MPESA_TILL_NUMBER || "8999944";
+const consumerKey = envValue("MPESA_CONSUMER_KEY");
+const consumerSecret = envValue("MPESA_CONSUMER_SECRET");
+const shortcode = envValue("MPESA_SHORTCODE");
+const passkey = envValue("MPESA_PASSKEY");
+const callbackBaseUrl = envValue("MPESA_CALLBACK_BASE_URL");
+const callbackSecret = envValue("MPESA_CALLBACK_SECRET");
+
+export const TILL_NUMBER = envValue("MPESA_TILL_NUMBER") || "8999944";
 export const TILL_NAME = "Top Dollars Ltd";
 
 // Safaricom's per-transaction ceiling for M-Pesa payments.
@@ -59,7 +65,10 @@ async function getAccessToken(): Promise<string> {
     headers: { Authorization: `Basic ${auth}` },
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Daraja auth failed (${res.status})`);
+  if (!res.ok) {
+    const detail = (await res.text().catch(() => "")).slice(0, 200);
+    throw new Error(`Daraja auth failed (${res.status}) ${detail}`.trim());
+  }
   const data = (await res.json()) as { access_token: string; expires_in: string };
 
   // Refresh a minute early so an in-flight request never uses a dead token.

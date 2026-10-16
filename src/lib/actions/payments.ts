@@ -90,8 +90,12 @@ export async function startLeasePayment(
       accountReference: "KifaruLease",
       description: "Lease payment",
     });
-  } catch {
-    result = { ok: false as const, message: "M-Pesa is unavailable" };
+  } catch (error) {
+    // Keep the real cause on the row (visible on hover in /kifaruadmin/payments)
+    // and in the server logs; the client only sees the generic message.
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("STK Push failed", message);
+    result = { ok: false as const, message: `M-Pesa is unavailable: ${message}`.slice(0, 500) };
   }
 
   if (!result.ok) {
