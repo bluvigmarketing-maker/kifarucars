@@ -43,8 +43,8 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <Button href="#enquiry" size="lg">
-              Get A Quote
+            <Button href="#fleet" size="lg">
+              Select A Car
             </Button>
             <Button href="#enquiry" variant="outline" size="lg" className="border-gold-400/70 text-white hover:border-gold-300 hover:text-white">
               Request A Callback

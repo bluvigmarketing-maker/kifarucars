@@ -165,7 +165,8 @@ export async function stkQuery(checkoutRequestId: string): Promise<StkQueryResul
 
   // While the customer is still on the PIN prompt Daraja answers with an
   // error body ("The transaction is being processed") and no ResultCode.
-  if (data.ResultCode === undefined) return { state: "pending" };
+  // 4999 ("still under processing") is likewise not a final result.
+  if (data.ResultCode === undefined || data.ResultCode === "4999") return { state: "pending" };
   return { state: "done", resultCode: Number(data.ResultCode), resultDesc: data.ResultDesc ?? "" };
 }
 

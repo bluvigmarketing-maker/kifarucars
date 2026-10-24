@@ -1,13 +1,23 @@
+export type PriceUnit = "day" | "month" | "custom";
+
 export type Vehicle = {
   id: string;
+  // Every descriptive field is optional when adding a vehicle — blank text
+  // is stored as "", blank numbers as null. Use vehicleTitle() to display.
   name: string;
   make: string;
-  year: number;
+  year: number | null;
   transmission: "Automatic" | "Manual";
-  seats: number;
+  seats: number | null;
   fuel_type: string;
+  engine_capacity: string;
+  // No longer collected or shown (engine capacity replaced it); kept for old rows.
   luggage_capacity: string;
   image_url: string;
+  // What the vehicle is charged at — see formatPrice() in lib/vehicle-display.ts.
+  price: number | null;
+  price_unit: PriceUnit | null;
+  price_custom_label: string | null;
   is_available: boolean;
   sort_order: number;
   created_at: string;
@@ -41,10 +51,11 @@ export type VehicleApplication = {
   id: string;
   name: string;
   make: string;
-  year: number;
+  year: number | null;
   transmission: "Automatic" | "Manual";
-  seats: number;
+  seats: number | null;
   fuel_type: string;
+  engine_capacity: string;
   luggage_capacity: string;
   mileage: number | null;
   chassis_number: string | null;
@@ -62,6 +73,9 @@ export type VehicleApplication = {
 
 export type EnquiryStatus = "new" | "contacted" | "closed";
 
+// Which form an enquiry came from — null is the general contact form.
+export type EnquiryService = "corporate_leasing";
+
 export type Enquiry = {
   id: string;
   first_name: string;
@@ -70,6 +84,8 @@ export type Enquiry = {
   phone: string;
   hear_about_us: string | null;
   message: string | null;
+  service: EnquiryService | null;
+  company: string | null;
   status: EnquiryStatus;
   created_at: string;
 };
@@ -143,12 +159,44 @@ export type ExtensionRequest = {
 
 export type ExtensionRequestWithLease = ExtensionRequest & { lease: LeaseWithRelations };
 
+export type BookingStatus = "pending" | "confirmed" | "declined" | "cancelled";
+
+// A date-range request from the calendar on /fleet/[id].
+export type Booking = {
+  id: string;
+  vehicle_id: string;
+  full_name: string;
+  phone: string;
+  email: string | null;
+  start_date: string;
+  end_date: string;
+  // Price breakdown when booked — see quoteBooking() in lib/vehicle-display.ts.
+  // estimated_total is the amount due, after the discount.
+  subtotal: number | null;
+  discount: number;
+  estimated_total: number | null;
+  notes: string | null;
+  status: BookingStatus;
+  created_at: string;
+};
+
+export type BookingWithVehicle = Booking & {
+  vehicle: Pick<Vehicle, "id" | "name" | "make" | "year">;
+  payments: Pick<Payment, "amount" | "status" | "mpesa_receipt">[];
+};
+
+// A blocked date range on the public calendar (inclusive, YYYY-MM-DD) —
+// dates only, from the get_vehicle_unavailable_ranges RPC.
+export type UnavailableRange = { start_date: string; end_date: string };
+
 export type PaymentStatus = "pending" | "paid" | "failed" | "cancelled";
 
-// One M-Pesa STK Push attempt against a lease balance (till 8999944).
+// One M-Pesa STK Push attempt (till 8999944) — against either a lease
+// balance (client portal) or a booking (calendar on /fleet/[id]).
 export type Payment = {
   id: string;
-  lease_id: string;
+  lease_id: string | null;
+  booking_id: string | null;
   amount: number;
   phone: string;
   status: PaymentStatus;
@@ -158,10 +206,14 @@ export type Payment = {
   result_code: number | null;
   result_desc: string | null;
   paid_at: string | null;
+  invoice_sent_at: string | null;
   created_at: string;
 };
 
-export type PaymentWithLease = Payment & { lease: LeaseWithRelations };
+export type PaymentWithLease = Payment & {
+  lease: LeaseWithRelations | null;
+  booking: Omit<BookingWithVehicle, "payments"> | null;
+};
 
 // Lease Records list: a lease plus just enough of its extensions/payments
 // to compute total due and balance.
@@ -178,7 +230,7 @@ export type ClientPortalView = {
   clientFirstName: string;
   vehicleName: string;
   vehicleMake: string;
-  vehicleYear: number;
+  vehicleYear: number | null;
   vehicleImageUrl: string;
   startDate: string;
   endDate: string;

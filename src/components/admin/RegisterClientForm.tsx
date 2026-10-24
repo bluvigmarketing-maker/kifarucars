@@ -6,6 +6,7 @@ import { registerClient } from "@/lib/actions/leases";
 import { Button } from "@/components/ui/Button";
 import type { RegisterClientFormState } from "@/lib/validations";
 import type { Vehicle } from "@/lib/types";
+import { vehicleTitle } from "@/lib/vehicle-display";
 
 const initialState: RegisterClientFormState = { status: "idle" };
 
@@ -109,7 +110,8 @@ export function RegisterClientForm({ vehicles }: { vehicles: Vehicle[] }) {
               </option>
               {vehicles.map((vehicle) => (
                 <option key={vehicle.id} value={vehicle.id}>
-                  {vehicle.make} {vehicle.name} ({vehicle.year})
+                  {vehicleTitle(vehicle)}
+                  {vehicle.year ? ` (${vehicle.year})` : ""}
                 </option>
               ))}
             </select>

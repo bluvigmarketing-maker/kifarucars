@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { verifyAdmin } from "@/lib/admin/dal";
 import { createClient } from "@/lib/supabase/server";
 import { VehicleSchema, type VehicleFormState } from "@/lib/validations";
+import { FALLBACK_VEHICLE_IMAGE } from "@/lib/vehicle-display";
 
 export async function saveVehicle(
   _prevState: VehicleFormState,
@@ -19,8 +20,11 @@ export async function saveVehicle(
     transmission: formData.get("transmission"),
     seats: formData.get("seats"),
     fuelType: formData.get("fuelType"),
-    luggageCapacity: formData.get("luggageCapacity"),
-    imageUrl: formData.get("imageUrl"),
+    engineCapacity: formData.get("engineCapacity"),
+    imageUrl: formData.get("imageUrl") ?? undefined,
+    price: formData.get("price"),
+    priceUnit: formData.get("priceUnit"),
+    priceCustomLabel: formData.get("priceCustomLabel") ?? undefined,
     isAvailable: formData.get("isAvailable") === "on",
     mileage: formData.get("mileage"),
     chassisNumber: formData.get("chassisNumber"),
@@ -41,17 +45,21 @@ export async function saveVehicle(
     };
   }
 
+  const { price, priceUnit, priceCustomLabel } = validated.data;
   const id = formData.get("id");
   const supabase = await createClient();
   const record = {
     name: validated.data.name,
     make: validated.data.make,
-    year: validated.data.year,
+    year: validated.data.year ?? null,
     transmission: validated.data.transmission,
-    seats: validated.data.seats,
+    seats: validated.data.seats ?? null,
     fuel_type: validated.data.fuelType,
-    luggage_capacity: validated.data.luggageCapacity,
-    image_url: validated.data.imageUrl,
+    engine_capacity: validated.data.engineCapacity,
+    image_url: validated.data.imageUrl || FALLBACK_VEHICLE_IMAGE,
+    price: price ?? null,
+    price_unit: price != null || priceUnit === "custom" ? (priceUnit ?? null) : null,
+    price_custom_label: priceUnit === "custom" ? priceCustomLabel || null : null,
     is_available: validated.data.isAvailable ?? false,
     mileage: validated.data.mileage ?? null,
     chassis_number: validated.data.chassisNumber || null,

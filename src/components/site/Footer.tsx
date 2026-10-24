@@ -7,12 +7,11 @@ import { NewsletterForm } from "@/components/site/NewsletterForm";
 
 const FOOTER_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Our Fleet", href: "#fleet" },
-  { label: "Expat Car Hire", href: "#services" },
-  { label: "About Us", href: "#about" },
-  { label: "Corporate Leasing", href: "#services" },
-  { label: "Contact Us", href: "#enquiry" },
-  { label: "FAQs", href: "#faqs" },
+  { label: "Our Fleet", href: "/#fleet" },
+  { label: "About Us", href: "/#about" },
+  { label: "Corporate Leasing", href: "/corporate-leasing" },
+  { label: "Contact Us", href: "/#enquiry" },
+  { label: "FAQs", href: "/#faqs" },
   { label: "List Your Car", href: "/list-your-car" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Privacy Policy", href: "/privacy" },

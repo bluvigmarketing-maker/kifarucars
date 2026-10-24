@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { verifyAdmin } from "@/lib/admin/dal";
 import { createClient } from "@/lib/supabase/server";
 import { getApplicationById } from "@/lib/admin/data";
+import { FALLBACK_VEHICLE_IMAGE } from "@/lib/vehicle-display";
 
 export async function approveApplication(id: string) {
   await verifyAdmin();
@@ -19,8 +20,9 @@ export async function approveApplication(id: string) {
     transmission: application.transmission,
     seats: application.seats,
     fuel_type: application.fuel_type,
+    engine_capacity: application.engine_capacity,
     luggage_capacity: application.luggage_capacity,
-    image_url: "/vehicles/placeholder-suv.svg",
+    image_url: FALLBACK_VEHICLE_IMAGE,
     is_available: false,
     mileage: application.mileage,
     chassis_number: application.chassis_number,

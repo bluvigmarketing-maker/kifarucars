@@ -34,9 +34,8 @@ export function CoverImageField({
           name="imageUrl"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          required
           className={`${inputClasses} mt-0 flex-1`}
-          placeholder="/vehicles/placeholder-suv.svg or upload a photo"
+          placeholder="Optional — upload a photo or paste a URL"
         />
         <label
           htmlFor={id}

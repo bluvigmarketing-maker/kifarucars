@@ -2,12 +2,12 @@ import "server-only";
 import { isSupabaseConfigured } from "./supabase/env";
 import { createClient } from "./supabase/server";
 import { PLACEHOLDER_REVIEWS, PLACEHOLDER_VEHICLES } from "./placeholder-data";
-import type { PublicVehicle, Review, Vehicle } from "./types";
+import type { PublicVehicle, Review, UnavailableRange, Vehicle } from "./types";
 
 // Columns safe to send to the browser — excludes ownership/document data
 // that's staff-only in the admin dashboard (see PublicVehicle in types.ts).
 const PUBLIC_VEHICLE_COLUMNS =
-  "id, name, make, year, transmission, seats, fuel_type, luggage_capacity, mileage, additional_features, image_url, gallery_urls, video_url, hover_sound_url, is_available, sort_order, created_at";
+  "id, name, make, year, transmission, seats, fuel_type, engine_capacity, luggage_capacity, mileage, additional_features, image_url, price, price_unit, price_custom_label, gallery_urls, video_url, hover_sound_url, is_available, sort_order, created_at";
 
 // Strips staff-only fields before a Vehicle is sent to a client component —
 // used for the placeholder fallback, which is otherwise shaped like the full
@@ -21,10 +21,14 @@ function toPublicVehicle(vehicle: Vehicle): PublicVehicle {
     transmission: vehicle.transmission,
     seats: vehicle.seats,
     fuel_type: vehicle.fuel_type,
+    engine_capacity: vehicle.engine_capacity,
     luggage_capacity: vehicle.luggage_capacity,
     mileage: vehicle.mileage,
     additional_features: vehicle.additional_features,
     image_url: vehicle.image_url,
+    price: vehicle.price,
+    price_unit: vehicle.price_unit,
+    price_custom_label: vehicle.price_custom_label,
     gallery_urls: vehicle.gallery_urls,
     video_url: vehicle.video_url,
     hover_sound_url: vehicle.hover_sound_url,
@@ -95,4 +99,18 @@ export async function getReviewsForVehicle(vehicleId: string): Promise<Review[]>
 
   if (error || !data) return [];
   return data as Review[];
+}
+
+// Dates the booking calendar on /fleet/[id] greys out. Dates only — the
+// RPC never returns who booked (see 0008_pricing_bookings.sql).
+export async function getUnavailableRanges(vehicleId: string): Promise<UnavailableRange[]> {
+  if (!isSupabaseConfigured) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_vehicle_unavailable_ranges", {
+    p_vehicle_id: vehicleId,
+  });
+
+  if (error || !data) return [];
+  return data as UnavailableRange[];
 }

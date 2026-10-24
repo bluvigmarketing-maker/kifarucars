@@ -7,16 +7,17 @@ import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LexusSuvIcon } from "@/components/site/LexusSuvIcon";
 
+// Section links are rooted at "/" so they also work from other pages.
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Corporate Car Hire", href: "#services" },
-  { label: "Corporate Leasing", href: "#services" },
-  { label: "Expat Car Hire", href: "#services" },
-  { label: "Our Fleet", href: "#fleet" },
-  { label: "About Us", href: "#about" },
-  { label: "Contact Us", href: "#enquiry" },
-  { label: "List Your Car", href: "/list-your-car" },
+  { label: "Corporate Car Hire", href: "/#fleet" },
+  { label: "Corporate Leasing", href: "/corporate-leasing" },
+  { label: "Our Fleet", href: "/#fleet" },
+  { label: "About Us", href: "/#about" },
+  { label: "Contact Us", href: "/#enquiry" },
+  { label: "List Your Car", href: "/list-your-car", icon: true },
 ];
 
 export function Header() {
@@ -42,8 +43,9 @@ export function Header() {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-charcoal-700 transition-colors hover:text-burgundy-700 dark:text-charcoal-300 dark:hover:text-burgundy-400"
+              className="flex items-center gap-1.5 text-sm font-medium text-charcoal-700 transition-colors hover:text-burgundy-700 dark:text-charcoal-300 dark:hover:text-burgundy-400"
             >
+              {link.icon ? <LexusSuvIcon className="text-burgundy-600 dark:text-burgundy-400" /> : null}
               {link.label}
             </a>
           ))}
@@ -51,8 +53,8 @@ export function Header() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <ThemeToggle />
-          <Button href="#enquiry" size="sm">
-            Get A Quote
+          <Button href="/#fleet" size="sm">
+            Select A Car
           </Button>
         </div>
 
@@ -77,13 +79,14 @@ export function Header() {
                 key={link.label}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-2 py-2.5 text-sm font-medium text-charcoal-800 hover:bg-charcoal-50 dark:text-charcoal-200 dark:hover:bg-charcoal-800"
+                className="flex items-center gap-2 rounded-lg px-2 py-2.5 text-sm font-medium text-charcoal-800 hover:bg-charcoal-50 dark:text-charcoal-200 dark:hover:bg-charcoal-800"
               >
+                {link.icon ? <LexusSuvIcon className="text-burgundy-600 dark:text-burgundy-400" /> : null}
                 {link.label}
               </a>
             ))}
-            <Button href="#enquiry" size="sm" className="mt-2 w-full" onClick={() => setOpen(false)}>
-              Get A Quote
+            <Button href="/#fleet" size="sm" className="mt-2 w-full" onClick={() => setOpen(false)}>
+              Select A Car
             </Button>
           </Container>
         </div>

@@ -23,8 +23,16 @@ export function EnquiriesTable({ enquiries }: { enquiries: Enquiry[] }) {
         <div key={enquiry.id} className="rounded-2xl border-2 border-gold-500/60 bg-white p-5 shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="font-medium text-charcoal-950 dark:text-white">
+              <p className="flex flex-wrap items-center gap-2 font-medium text-charcoal-950 dark:text-white">
                 {enquiry.first_name} {enquiry.last_name}
+                {enquiry.company ? (
+                  <span className="font-normal text-charcoal-500 dark:text-charcoal-400">· {enquiry.company}</span>
+                ) : null}
+                {enquiry.service === "corporate_leasing" ? (
+                  <span className="rounded-full bg-gold-500/15 px-2.5 py-0.5 text-xs font-medium text-gold-600 dark:text-gold-400">
+                    Corporate leasing quote
+                  </span>
+                ) : null}
               </p>
               <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
                 {enquiry.email} &middot; {enquiry.phone}

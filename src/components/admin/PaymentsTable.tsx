@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { vehicleTitle } from "@/lib/vehicle-display";
 import { formatKes } from "@/lib/payments/balance";
 import type { PaymentStatus, PaymentWithLease } from "@/lib/types";
 
@@ -31,10 +32,17 @@ export function PaymentsTable({ payments }: { payments: PaymentWithLease[] }) {
                 {new Date(payment.paid_at ?? payment.created_at).toLocaleString()}
               </td>
               <td className="px-5 py-3.5 font-medium text-charcoal-950 dark:text-white">
-                {payment.lease.client.full_name}
+                {payment.lease?.client.full_name ?? payment.booking?.full_name ?? "—"}
+                <span className="block text-xs font-normal text-charcoal-500 dark:text-charcoal-400">
+                  {payment.booking ? "Booking" : "Lease"}
+                </span>
               </td>
               <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">
-                {payment.lease.vehicle.make} {payment.lease.vehicle.name}
+                {payment.lease
+                  ? vehicleTitle(payment.lease.vehicle)
+                  : payment.booking
+                    ? vehicleTitle(payment.booking.vehicle)
+                    : "—"}
               </td>
               <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">{payment.phone}</td>
               <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">{formatKes(payment.amount)}</td>

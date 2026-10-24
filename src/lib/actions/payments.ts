@@ -5,24 +5,14 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { hashPortalToken } from "@/lib/client-portal/dal";
 import { getLeaseBalance } from "@/lib/payments/balance";
-import {
-  isMpesaConfigured,
-  MAX_STK_AMOUNT,
-  normalizeKenyanPhone,
-  statusForResultCode,
-  stkPush,
-  stkQuery,
-} from "@/lib/mpesa/daraja";
+import { isMpesaConfigured, MAX_STK_AMOUNT, normalizeKenyanPhone } from "@/lib/mpesa/daraja";
+import { settleViaQueryIfStale, startStkPayment } from "@/lib/payments/stk";
 import { PaymentSchema, type PaymentFormState } from "@/lib/validations";
 import type { PaymentStatus } from "@/lib/types";
 
 // Like submitExtensionRequest, there is no session here: the portal token is
 // the credential. It's re-verified via get_portal_view on every call, and
 // the lease id / balance always come from the database, never the form.
-
-const RETRY_COOLDOWN_MS = 60_000;
-// Give the callback a head start before falling back to STK Query.
-const QUERY_AFTER_MS = 20_000;
 
 export async function startLeasePayment(
   _prevState: PaymentFormState,
@@ -60,65 +50,17 @@ export async function startLeasePayment(
     return { status: "error", message: `M-Pesa allows up to KES ${MAX_STK_AMOUNT.toLocaleString()} per payment — please pay in parts.` };
   }
 
-  const admin = createAdminClient();
-
-  // One prompt at a time per lease, so a double-tap doesn't send two.
-  const { data: recent } = await admin
-    .from("payments")
-    .select("id")
-    .eq("lease_id", view.lease_id)
-    .eq("status", "pending")
-    .gte("created_at", new Date(Date.now() - RETRY_COOLDOWN_MS).toISOString())
-    .limit(1);
-  if (recent && recent.length > 0) {
-    return { status: "error", message: "A payment prompt was just sent. Check your phone, or try again in a minute." };
-  }
-
-  // Insert first so the callback always finds a row to update.
-  const { data: payment, error: insertError } = await admin
-    .from("payments")
-    .insert({ lease_id: view.lease_id, amount, phone, status: "pending" })
-    .select("id")
-    .single();
-  if (insertError || !payment) return { status: "error", message: "We couldn't start the payment. Please try again." };
-
-  let result;
-  try {
-    result = await stkPush({
-      phone,
-      amount,
-      accountReference: "KifaruLease",
-      description: "Lease payment",
-    });
-  } catch (error) {
-    // Keep the real cause on the row (visible on hover in /kifaruadmin/payments)
-    // and in the server logs; the client only sees the generic message.
-    const message = error instanceof Error ? error.message : String(error);
-    console.error("STK Push failed", message);
-    result = { ok: false as const, message: `M-Pesa is unavailable: ${message}`.slice(0, 500) };
-  }
-
-  if (!result.ok) {
-    await admin
-      .from("payments")
-      .update({ status: "failed", result_desc: result.message })
-      .eq("id", payment.id);
-    return { status: "error", message: "We couldn't reach M-Pesa. Please try again in a moment." };
-  }
-
-  await admin
-    .from("payments")
-    .update({ merchant_request_id: result.merchantRequestId, checkout_request_id: result.checkoutRequestId })
-    .eq("id", payment.id);
-
-  return { status: "sent", paymentId: payment.id };
+  const result = await startStkPayment(
+    { leaseId: view.lease_id },
+    { amount, phone, accountReference: "KifaruLease", description: "Lease payment" }
+  );
+  if (!result.ok) return { status: "error", message: result.message };
+  return { status: "sent", paymentId: result.paymentId };
 }
 
 /**
- * Polled by the portal while the customer is on the PIN prompt. Normally the
- * callback has already settled the row; if it's still pending after
- * QUERY_AFTER_MS, asks Daraja directly so a lost callback doesn't leave the
- * client stuck.
+ * Polled by the portal while the customer is on the PIN prompt — see
+ * settleViaQueryIfStale for the lost-callback fallback.
  */
 export async function getPaymentStatus(token: string, paymentId: string): Promise<PaymentStatus | null> {
   if (!isServiceRoleConfigured || !token || !paymentId) return null;
@@ -132,40 +74,12 @@ export async function getPaymentStatus(token: string, paymentId: string): Promis
     .maybeSingle();
   if (!payment) return null;
 
-  if (
-    payment.status === "pending" &&
-    payment.checkout_request_id &&
-    isMpesaConfigured &&
-    Date.now() - new Date(payment.created_at).getTime() > QUERY_AFTER_MS
-  ) {
-    try {
-      const query = await stkQuery(payment.checkout_request_id);
-      if (query.state === "done") {
-        const status = statusForResultCode(query.resultCode);
-        const { data: updated } = await admin
-          .from("payments")
-          .update({
-            status,
-            result_code: query.resultCode,
-            result_desc: query.resultDesc,
-            paid_at: status === "paid" ? new Date().toISOString() : null,
-          })
-          .eq("id", payment.id)
-          .eq("status", "pending")
-          .select("status")
-          .maybeSingle();
-        if (updated) {
-          revalidatePath(`/portal/${token}`);
-          return updated.status as PaymentStatus;
-        }
-        // The callback won the race — fall through to re-read below.
-        const { data: fresh } = await admin.from("payments").select("status").eq("id", payment.id).single();
-        return (fresh?.status as PaymentStatus) ?? null;
-      }
-    } catch {
-      // Daraja unreachable — keep reporting pending; the next poll retries.
-    }
-  }
-
-  return payment.status as PaymentStatus;
+  const status = await settleViaQueryIfStale({
+    id: payment.id,
+    status: payment.status as PaymentStatus,
+    checkout_request_id: payment.checkout_request_id,
+    created_at: payment.created_at,
+  });
+  if (status !== payment.status) revalidatePath(`/portal/${token}`);
+  return status;
 }

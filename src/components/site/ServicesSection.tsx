@@ -4,9 +4,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { BUSINESS } from "@/lib/placeholder-data";
 
 const SERVICES = [
-  { label: "Corporate Car Hire", href: "#enquiry" },
-  { label: "Corporate Leasing", href: "#enquiry" },
-  { label: "Expat Car Hire", href: "#enquiry" },
+  { label: "Corporate Car Hire", href: "#fleet" },
+  { label: "Corporate Leasing", href: "/corporate-leasing" },
 ];
 
 export function ServicesSection() {

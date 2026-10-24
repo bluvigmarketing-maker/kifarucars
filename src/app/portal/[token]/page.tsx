@@ -9,6 +9,7 @@ import { formatKes, getLeaseBalance } from "@/lib/payments/balance";
 import { isMpesaConfigured, TILL_NAME, TILL_NUMBER } from "@/lib/mpesa/daraja";
 import { isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { cn } from "@/lib/cn";
+import { vehicleTitle } from "@/lib/vehicle-display";
 
 // Per-token data, never prerenderable — same reasoning as /kifaruadmin/**.
 export const dynamic = "force-dynamic";
@@ -51,14 +52,14 @@ export default async function ClientPortalPage({ params }: PageProps<"/portal/[t
     <div className="mx-auto w-full max-w-2xl">
       <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Welcome, {view.clientFirstName}</p>
       <h1 className="mt-1 font-display text-3xl text-charcoal-950 dark:text-white">
-        {view.vehicleMake} {view.vehicleName}
+        {vehicleTitle({ make: view.vehicleMake, name: view.vehicleName })}
       </h1>
 
       <div className="mt-6 overflow-hidden rounded-2xl border-2 border-gold-500/60 bg-white shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900">
         <div className="relative aspect-video w-full bg-charcoal-100 dark:bg-charcoal-800">
           <Image
             src={view.vehicleImageUrl}
-            alt={`${view.vehicleMake} ${view.vehicleName}`}
+            alt={vehicleTitle({ make: view.vehicleMake, name: view.vehicleName })}
             fill
             className="object-cover"
           />
