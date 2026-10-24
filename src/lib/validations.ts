@@ -212,8 +212,6 @@ export type BookingFormState =
       // panel can retry payment rather than create a second booking.
       bookingId?: string;
     }
-  // Custom-priced (or online payment unavailable): sent as a request only.
-  | { status: "requested" }
   // M-Pesa prompt sent; the panel polls getBookingPaymentStatus.
   | { status: "sent"; bookingId: string; paymentId: string; amount: number };
 

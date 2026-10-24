@@ -10,9 +10,14 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createAdminClient, isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { BookingSchema, type BookingFormState } from "@/lib/validations";
+import { formatKes } from "@/lib/payments/balance";
 import { quoteBooking } from "@/lib/vehicle-display";
 import type { BookingStatus, PaymentStatus } from "@/lib/types";
 
+// To book, the customer has to pay: submitting creates a pending booking
+// and sends the M-Pesa prompt, and the booking is confirmed only once paid
+// (see onPaymentPaid). There's no unpaid "request" path.
+//
 // No session on the public side: the booking id returned after submit is
 // the customer's handle for polling/retrying payment. Amounts always come
 // from the database + quoteBooking, never from the form.
@@ -38,7 +43,7 @@ export async function submitBooking(
   if (!isSupabaseConfigured) {
     return {
       status: "error",
-      message: "Bookings aren't connected yet — set up Supabase to start receiving requests (see README).",
+      message: "Online booking isn't available right now. Please call us to book.",
     };
   }
 
@@ -62,11 +67,23 @@ export async function submitBooking(
     };
   }
 
+  // A booking only exists once it's paid for, so anything that can't be
+  // paid by M-Pesa right now can't be booked online at all.
+  if (!isMpesaConfigured || !isServiceRoleConfigured) {
+    return { status: "error", message: "Online booking isn't available right now. Please call us to book." };
+  }
   const quote = quoteBooking(vehicle, daysInclusive(startDate, endDate));
-  const canPayOnline =
-    quote !== null && quote.total >= 1 && quote.total <= MAX_STK_AMOUNT && isMpesaConfigured && isServiceRoleConfigured;
+  if (!quote) {
+    return { status: "error", message: "This car can't be booked online. Please call us to book it." };
+  }
+  if (quote.total > MAX_STK_AMOUNT) {
+    return {
+      status: "error",
+      message: `M-Pesa allows up to ${formatKes(MAX_STK_AMOUNT)} per payment — please call us to book these dates.`,
+    };
+  }
 
-  const phone = canPayOnline ? normalizeKenyanPhone(validated.data.phone) : validated.data.phone;
+  const phone = normalizeKenyanPhone(validated.data.phone);
   if (!phone) {
     return { status: "error", errors: { phone: ["Enter a valid Safaricom number, e.g. 0712 345 678."] } };
   }
@@ -78,22 +95,11 @@ export async function submitBooking(
     email,
     start_date: startDate,
     end_date: endDate,
-    subtotal: quote?.subtotal ?? null,
-    discount: quote?.discount ?? 0,
-    estimated_total: quote?.total ?? null,
+    subtotal: quote.subtotal,
+    discount: quote.discount,
+    estimated_total: quote.total,
     notes: notes || null,
   };
-
-  if (!canPayOnline) {
-    // Custom pricing (or M-Pesa not set up): a request staff follow up on.
-    const supabase = await createClient();
-    const { error } = await supabase.from("bookings").insert(record);
-    if (error) {
-      return { status: "error", message: "Something went wrong sending your request. Please try again." };
-    }
-    revalidatePath("/kifaruadmin/bookings");
-    return { status: "requested" };
-  }
 
   const admin = createAdminClient();
   const { data: booking, error } = await admin.from("bookings").insert(record).select("id").single();

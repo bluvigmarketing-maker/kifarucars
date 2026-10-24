@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState, useEffect, useState, useTransition } from "react";
-import { CalendarCheck, CheckCircle2, Loader2, Smartphone, Tag, X } from "lucide-react";
+import { CheckCircle2, Loader2, Phone, Smartphone, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BookingCalendar, type DateRange } from "@/components/site/BookingCalendar";
 import { getBookingPaymentStatus, retryBookingPayment, submitBooking } from "@/lib/actions/bookings";
 import { daysInclusive, formatDisplayDate } from "@/lib/booking-dates";
 import { cn } from "@/lib/cn";
 import { formatKes } from "@/lib/payments/balance";
+import { BUSINESS } from "@/lib/placeholder-data";
 import {
   BOOKING_DISCOUNT,
   DISCOUNT_MIN_DAYS,
@@ -32,7 +33,7 @@ const cardClasses =
 type Props = {
   vehicle: PublicVehicle;
   unavailable: UnavailableRange[];
-  // M-Pesa + service role configured — otherwise bookings are requests only.
+  // M-Pesa + service role configured — otherwise nothing can be booked online.
   onlinePayment: boolean;
 };
 
@@ -81,7 +82,9 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
   const price = formatPrice(vehicle);
   const days = range.start && range.end ? daysInclusive(range.start, range.end) : 0;
   const quote = days ? quoteBooking(vehicle, days) : null;
-  const paysOnline = onlinePayment && quote !== null;
+  // To book, the customer has to pay — so only per-day/per-month priced
+  // cars can be booked here, and only while M-Pesa is set up.
+  const bookable = onlinePayment && quoteBooking(vehicle, 1) !== null;
 
   useEffect(() => {
     if (!waitingFor || !bookingId) return;
@@ -112,23 +115,6 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
 
   const dates =
     range.start && range.end ? `${formatDisplayDate(range.start)} – ${formatDisplayDate(range.end)}` : null;
-
-  if (submitState.status === "requested") {
-    return (
-      <div className={cn(cardClasses, "flex items-start gap-3 p-6")}>
-        <CheckCircle2 className="mt-0.5 flex-shrink-0 text-burgundy-600 dark:text-burgundy-400" size={22} />
-        <div>
-          <p className="font-medium text-charcoal-950 dark:text-white">
-            Booking request sent for the {vehicleTitle(vehicle)}.
-          </p>
-          <p className="mt-1 text-sm text-charcoal-600 dark:text-charcoal-300">
-            {dates ? `${dates}. ` : null}
-            Our team will call you shortly to confirm the price and arrange payment.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (settled === "paid") {
     return (
@@ -216,7 +202,30 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
           <BookingCalendar value={range} onChange={setRange} unavailable={unavailable} />
         </div>
 
-        {paymentStage ?? (
+        {!bookable ? (
+          <div className="flex flex-col gap-4 p-5 sm:p-7">
+            {price ? (
+              <p className="text-charcoal-600 dark:text-charcoal-300">
+                {price.amount ? (
+                  <span className="font-display text-2xl text-charcoal-950 dark:text-white">{price.amount}</span>
+                ) : null}{" "}
+                {price.unit ? <span className="text-sm">{price.unit}</span> : null}
+              </p>
+            ) : null}
+            <p className="font-medium text-charcoal-950 dark:text-white">Call us to book this car</p>
+            <p className="text-sm text-charcoal-600 dark:text-charcoal-300">
+              {onlinePayment
+                ? "This car isn't available for online booking. Use the calendar to check free dates, then get in touch and we'll arrange your booking and payment."
+                : "Online booking and payment is unavailable right now. Use the calendar to check free dates, then get in touch to book."}
+            </p>
+            <Button href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`} size="lg">
+              <Phone size={18} /> {BUSINESS.phone}
+            </Button>
+            <Button href={`https://wa.me/${BUSINESS.whatsapp}`} variant="outline" size="lg">
+              WhatsApp Us
+            </Button>
+          </div>
+        ) : paymentStage ?? (
           <form
             action={(formData) => {
               setRetryState(null);
@@ -285,10 +294,6 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
                     <dd>{formatKes(quote.total)}</dd>
                   </div>
                 </dl>
-              ) : days && price ? (
-                <p className="mt-2 text-xs text-charcoal-500 dark:text-charcoal-400">
-                  We&apos;ll confirm the total for these dates when we call you.
-                </p>
               ) : null}
 
               {quote && quote.discount === 0 ? (
@@ -306,7 +311,7 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                 <div>
-                  <label className={labelClasses}>{paysOnline ? "M-Pesa phone number" : "Phone"}</label>
+                  <label className={labelClasses}>M-Pesa phone number</label>
                   <input
                     type="tel"
                     name="phone"
@@ -347,19 +352,16 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
             ) : null}
 
             <Button type="submit" size="lg" disabled={submitting || !range.start || !range.end}>
-              {paysOnline ? <Smartphone size={18} /> : <CalendarCheck size={18} />}
+              <Smartphone size={18} />
               {submitting
-                ? paysOnline
-                  ? "Sending M-Pesa prompt..."
-                  : "Sending..."
-                : paysOnline
-                  ? `Pay ${formatKes(quote.total)} with M-Pesa`
-                  : "Request Booking"}
+                ? "Sending M-Pesa prompt..."
+                : quote
+                  ? `Pay ${formatKes(quote.total)} to Book`
+                  : "Pay with M-Pesa to Book"}
             </Button>
             <p className="-mt-2 text-center text-xs text-charcoal-500 dark:text-charcoal-400">
-              {paysOnline
-                ? "You'll get an M-Pesa prompt on this number, and a PDF invoice by email once paid."
-                : "No payment now — we'll confirm with you first."}
+              You&apos;ll get an M-Pesa prompt on this number. Your booking is confirmed once paid, and your
+              PDF invoice is emailed to you.
             </p>
           </form>
         )}
