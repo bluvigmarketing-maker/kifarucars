@@ -18,7 +18,7 @@ const STATUS_STYLES: Record<BookingStatus, string> = {
   cancelled: "bg-charcoal-100 text-charcoal-500 dark:bg-charcoal-800 dark:text-charcoal-400",
 };
 
-export function BookingsTable({ bookings }: { bookings: BookingWithVehicle[] }) {
+export function BookingsTable({ bookings, emptyMessage }: { bookings: BookingWithVehicle[]; emptyMessage: string }) {
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -123,9 +123,9 @@ export function BookingsTable({ bookings }: { bookings: BookingWithVehicle[] }) 
         );
       })}
 
-      {bookings.length === 0 ? (
+      {bookings.length === 0 && emptyMessage ? (
         <p className="rounded-2xl border border-charcoal-100 bg-white p-10 text-center text-charcoal-500 dark:border-charcoal-800 dark:bg-charcoal-900 dark:text-charcoal-400">
-          No booking requests yet.
+          {emptyMessage}
         </p>
       ) : null}
     </div>
