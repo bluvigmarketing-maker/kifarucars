@@ -47,7 +47,13 @@ that can't yet authenticate anyone.
    `extension_requests`, and the token-based `get_portal_view` /
    `request_lease_extension` functions used by `/portal/[token]`;
    `0007_mpesa_payments.sql` adds M-Pesa `payments` and lease balances
-   (STK Push setup: see the `MPESA_*` section of `.env.example`).
+   (STK Push setup: see the `MPESA_*` section of `.env.example`);
+   `0008_pricing_bookings.sql` makes all vehicle details optional, adds
+   vehicle pricing (per day / per month / custom), and the `bookings` table
+   behind the calendar on `/fleet/[id]`; `0009_booking_payments_invoices.sql`
+   adds M-Pesa payment at booking (with the 5+ day discount), emailed PDF
+   invoices (SMTP setup: see the `SMTP_*` section of `.env.example`), engine
+   capacity, and corporate-leasing quote requests.
 4. `0002_seed_optional.sql` is optional — it seeds a handful of starter
    vehicles and reviews.
 5. Restart `npm run dev` so the new env vars are picked up.

@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type {
+  BookingWithVehicle,
   Enquiry,
   ExtensionRequestWithLease,
   LeaseWithBalance,
@@ -84,7 +85,7 @@ export async function listAllPayments(): Promise<PaymentWithLease[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("payments")
-    .select(`*, lease:leases(${LEASE_RELATIONS_SELECT})`)
+    .select(`*, lease:leases(${LEASE_RELATIONS_SELECT}), booking:bookings(*, vehicle:vehicles(id, name, make, year))`)
     .order("created_at", { ascending: false });
   return (data ?? []) as unknown as PaymentWithLease[];
 }
@@ -116,6 +117,15 @@ export async function getExtensionRequestById(id: string): Promise<ExtensionRequ
     .eq("id", id)
     .maybeSingle();
   return (data as unknown as ExtensionRequestWithLease) ?? null;
+}
+
+export async function listAllBookings(): Promise<BookingWithVehicle[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("bookings")
+    .select("*, vehicle:vehicles(id, name, make, year), payments(amount, status, mpesa_receipt)")
+    .order("created_at", { ascending: false });
+  return (data ?? []) as BookingWithVehicle[];
 }
 
 export async function getDashboardStats() {

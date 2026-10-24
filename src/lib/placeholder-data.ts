@@ -55,8 +55,12 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     transmission: "Automatic",
     seats: 7,
     fuel_type: "Diesel",
+    engine_capacity: "2,800cc", // PLACEHOLDER
     luggage_capacity: "3 Big, 2 Small",
     image_url: "/vehicles/placeholder-suv.svg",
+    price: 12000, // PLACEHOLDER
+    price_unit: "day",
+    price_custom_label: null,
     is_available: true,
     sort_order: 1,
     created_at: new Date().toISOString(),
@@ -70,8 +74,12 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     transmission: "Automatic",
     seats: 7,
     fuel_type: "Diesel",
+    engine_capacity: "2,800cc", // PLACEHOLDER
     luggage_capacity: "3 Big, 2 Small",
     image_url: "/vehicles/placeholder-suv.svg",
+    price: 12000, // PLACEHOLDER
+    price_unit: "day",
+    price_custom_label: null,
     is_available: true,
     sort_order: 2,
     created_at: new Date().toISOString(),
@@ -85,8 +93,12 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     transmission: "Manual",
     seats: 7,
     fuel_type: "Diesel",
+    engine_capacity: "2,800cc", // PLACEHOLDER
     luggage_capacity: "3 Big, 2 Small",
     image_url: "/vehicles/placeholder-suv.svg",
+    price: 12000, // PLACEHOLDER
+    price_unit: "day",
+    price_custom_label: null,
     is_available: true,
     sort_order: 3,
     created_at: new Date().toISOString(),
@@ -100,8 +112,12 @@ export const PLACEHOLDER_VEHICLES: Vehicle[] = [
     transmission: "Automatic",
     seats: 5,
     fuel_type: "Petrol",
+    engine_capacity: "2,700cc", // PLACEHOLDER
     luggage_capacity: "2 Big, 2 Small",
     image_url: "/vehicles/placeholder-suv.svg",
+    price: 12000, // PLACEHOLDER
+    price_unit: "day",
+    price_custom_label: null,
     is_available: true,
     sort_order: 4,
     created_at: new Date().toISOString(),

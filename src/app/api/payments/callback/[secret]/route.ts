@@ -1,7 +1,8 @@
 import { timingSafeEqual } from "crypto";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { createAdminClient, isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { getCallbackSecret, statusForResultCode } from "@/lib/mpesa/daraja";
+import { onPaymentPaid } from "@/lib/payments/settle";
 
 // Safaricom's STK Push result callback. Daraja doesn't sign callbacks, so
 // the unguessable [secret] path segment (MPESA_CALLBACK_SECRET) is what
@@ -62,14 +63,21 @@ export async function POST(request: Request, { params }: RouteContext<"/api/paym
 
   const admin = createAdminClient();
   let query = admin.from("payments").update(update).eq("checkout_request_id", callback.CheckoutRequestID);
-  // A success may also complete a row the STK Query fallback already marked
-  // paid (it has no receipt yet); a failure only ever settles a pending row.
+  // Safaricom's success callback is authoritative: it may complete a row the
+  // STK Query fallback already settled (paid without a receipt, or wrongly
+  // failed/cancelled from an interim answer). A failure only ever settles a
+  // pending row.
   query =
     status === "paid"
-      ? query.in("status", ["pending", "paid"]).is("mpesa_receipt", null)
+      ? query.is("mpesa_receipt", null)
       : query.eq("status", "pending");
-  const { error } = await query;
+  const { data: updated, error } = await query.select("id");
   if (error) console.error("M-Pesa callback update failed", callback.CheckoutRequestID, error.message);
+
+  // Confirm the booking and email the invoice once Safaricom has its 200.
+  if (status === "paid" && updated) {
+    for (const row of updated) after(() => onPaymentPaid(row.id));
+  }
 
   return ACCEPTED();
 }

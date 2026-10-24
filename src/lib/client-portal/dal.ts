@@ -15,7 +15,7 @@ type PortalViewRow = {
   client_first_name: string;
   vehicle_name: string;
   vehicle_make: string;
-  vehicle_year: number;
+  vehicle_year: number | null;
   vehicle_image_url: string;
   start_date: string;
   end_date: string;

@@ -6,6 +6,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { deleteVehicle, toggleVehicleAvailability } from "@/lib/actions/vehicles";
 import { cn } from "@/lib/cn";
 import type { Vehicle } from "@/lib/types";
+import { formatPriceText, vehicleSubtitle, vehicleTitle } from "@/lib/vehicle-display";
 
 export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
   const [isPending, startTransition] = useTransition();
@@ -17,6 +18,7 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
           <tr>
             <th className="px-5 py-3">Vehicle</th>
             <th className="px-5 py-3">Seats</th>
+            <th className="px-5 py-3">Price</th>
             <th className="px-5 py-3">Status</th>
             <th className="px-5 py-3 text-right">Actions</th>
           </tr>
@@ -25,12 +27,13 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
           {vehicles.map((vehicle) => (
             <tr key={vehicle.id}>
               <td className="px-5 py-3.5">
-                <p className="font-medium text-charcoal-950 dark:text-white">{vehicle.name}</p>
-                <p className="text-xs text-charcoal-500 dark:text-charcoal-400">
-                  {vehicle.make} &middot; {vehicle.year}
-                </p>
+                <p className="font-medium text-charcoal-950 dark:text-white">{vehicle.name || vehicleTitle(vehicle)}</p>
+                <p className="text-xs text-charcoal-500 dark:text-charcoal-400">{vehicleSubtitle(vehicle)}</p>
               </td>
-              <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">{vehicle.seats}</td>
+              <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">{vehicle.seats ?? "—"}</td>
+              <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">
+                {formatPriceText(vehicle) ?? "—"}
+              </td>
               <td className="px-5 py-3.5">
                 <button
                   type="button"
@@ -53,16 +56,16 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
                   <Link
                     href={`/kifaruadmin/fleet/${vehicle.id}`}
                     className="flex h-8 w-8 items-center justify-center rounded-lg text-charcoal-500 hover:bg-charcoal-50 hover:text-burgundy-700 dark:text-charcoal-400 dark:hover:bg-charcoal-800"
-                    aria-label={`Edit ${vehicle.name}`}
+                    aria-label={`Edit ${vehicleTitle(vehicle)}`}
                   >
                     <Pencil size={15} />
                   </Link>
                   <button
                     type="button"
                     disabled={isPending}
-                    aria-label={`Delete ${vehicle.name}`}
+                    aria-label={`Delete ${vehicleTitle(vehicle)}`}
                     onClick={() => {
-                      if (confirm(`Delete ${vehicle.name}? This can't be undone.`)) {
+                      if (confirm(`Delete ${vehicleTitle(vehicle)}? This can't be undone.`)) {
                         startTransition(() => deleteVehicle(vehicle.id));
                       }
                     }}
@@ -76,7 +79,7 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
           ))}
           {vehicles.length === 0 ? (
             <tr>
-              <td colSpan={4} className="px-5 py-10 text-center text-charcoal-500 dark:text-charcoal-400">
+              <td colSpan={5} className="px-5 py-10 text-center text-charcoal-500 dark:text-charcoal-400">
                 No vehicles yet — add your first one.
               </td>
             </tr>

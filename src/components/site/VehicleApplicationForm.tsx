@@ -117,15 +117,18 @@ export function VehicleApplicationForm() {
     <form action={formAction} className="space-y-8">
       <div>
         <h3 className="font-display text-lg text-charcoal-950 dark:text-white">Vehicle Details</h3>
+        <p className="mt-1 text-sm text-charcoal-500 dark:text-charcoal-400">
+          All optional — share what you know and we&apos;ll fill in the rest with you.
+        </p>
         <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Field label="Vehicle name" name="name" errors={errors}>
-            <input name="name" required className={inputClasses} placeholder="e.g. Land Cruiser Prado" />
+            <input name="name" className={inputClasses} placeholder="e.g. Land Cruiser Prado" />
           </Field>
           <Field label="Make" name="make" errors={errors}>
-            <input name="make" required className={inputClasses} placeholder="e.g. Toyota" />
+            <input name="make" className={inputClasses} placeholder="e.g. Toyota" />
           </Field>
           <Field label="Year" name="year" errors={errors}>
-            <input type="number" name="year" required className={inputClasses} />
+            <input type="number" name="year" className={inputClasses} placeholder="e.g. 2021" />
           </Field>
           <Field label="Transmission" name="transmission" errors={errors}>
             <select name="transmission" defaultValue="Automatic" className={inputClasses}>
@@ -134,13 +137,13 @@ export function VehicleApplicationForm() {
             </select>
           </Field>
           <Field label="Seats" name="seats" errors={errors}>
-            <input type="number" name="seats" defaultValue={5} required className={inputClasses} />
+            <input type="number" name="seats" min={1} className={inputClasses} placeholder="e.g. 7" />
           </Field>
           <Field label="Fuel type" name="fuelType" errors={errors}>
-            <input name="fuelType" required className={inputClasses} placeholder="e.g. Petrol, Diesel" />
+            <input name="fuelType" className={inputClasses} placeholder="e.g. Petrol, Diesel" />
           </Field>
-          <Field label="Luggage capacity" name="luggageCapacity" errors={errors}>
-            <input name="luggageCapacity" required className={inputClasses} placeholder="e.g. 2 Big, 2 Small" />
+          <Field label="Engine capacity" name="engineCapacity" errors={errors}>
+            <input name="engineCapacity" className={inputClasses} placeholder="e.g. 2,800cc" />
           </Field>
           <Field label="Mileage (km)" name="mileage" errors={errors}>
             <input type="number" name="mileage" min={0} className={inputClasses} />

@@ -7,6 +7,7 @@ import { getLeaseDisplayStatus, getRemainingDays, type LeaseDisplayStatus } from
 import { cn } from "@/lib/cn";
 import { formatKes, getLeaseBalanceFromRelations } from "@/lib/payments/balance";
 import type { LeaseWithBalance } from "@/lib/types";
+import { vehicleTitle } from "@/lib/vehicle-display";
 
 const STATUS_STYLES: Record<LeaseDisplayStatus, string> = {
   active: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400",
@@ -77,7 +78,7 @@ export function LeasesTable({ leases }: { leases: LeaseWithBalance[] }) {
                     <p className="text-xs text-charcoal-500 dark:text-charcoal-400">{lease.client.phone}</p>
                   </td>
                   <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">
-                    {lease.vehicle.make} {lease.vehicle.name} &middot; {lease.vehicle.year}
+                    {[vehicleTitle(lease.vehicle), lease.vehicle.year].filter(Boolean).join(" · ")}
                   </td>
                   <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">
                     {lease.start_date} &rarr; {lease.end_date}

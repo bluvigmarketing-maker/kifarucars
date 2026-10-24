@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { Briefcase, Fuel, Settings2, Users, Volume2 } from "lucide-react";
+import { Cog, Fuel, Settings2, Users, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useEngineSound } from "@/hooks/useEngineSound";
 import type { PublicVehicle } from "@/lib/types";
+import { vehicleSubtitle, vehicleTitle } from "@/lib/vehicle-display";
 
 export function VehicleCard({
   vehicle,
@@ -17,6 +18,15 @@ export function VehicleCard({
 }) {
   const { play, stop } = useEngineSound(soundEnabled, vehicle.hover_sound_url);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const title = vehicleTitle(vehicle);
+  const subtitle = vehicleSubtitle(vehicle);
+  // Every detail is optional — only show the ones that were filled in.
+  const specs = [
+    { label: vehicle.transmission, Icon: Settings2 },
+    { label: vehicle.seats ? `${vehicle.seats} Passengers` : "", Icon: Users },
+    { label: vehicle.fuel_type, Icon: Fuel },
+    { label: vehicle.engine_capacity, Icon: Cog },
+  ].filter((spec) => spec.label);
 
   const handleHoverStart = () => {
     play();
@@ -45,7 +55,7 @@ export function VehicleCard({
       <div className="relative aspect-[4/3] overflow-hidden bg-charcoal-50 dark:bg-charcoal-800">
         <Image
           src={vehicle.image_url}
-          alt={`${vehicle.make} ${vehicle.name}`}
+          alt={title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -68,36 +78,28 @@ export function VehicleCard({
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-burgundy-600 dark:text-burgundy-400">
-          {vehicle.make} &middot; {vehicle.year}
-        </p>
-        <h3 className="mt-1 font-display text-xl text-charcoal-950 dark:text-white">{vehicle.name}</h3>
+        {subtitle ? (
+          <p className="text-xs font-semibold uppercase tracking-wide text-burgundy-600 dark:text-burgundy-400">
+            {subtitle}
+          </p>
+        ) : null}
+        <h3 className="mt-1 font-display text-xl text-charcoal-950 dark:text-white">{vehicle.name || title}</h3>
 
         <dl className="mt-4 grid grid-cols-2 gap-y-2.5 text-sm text-charcoal-600 dark:text-charcoal-300">
-          <div className="flex items-center gap-1.5">
-            <Settings2 size={15} className="text-charcoal-400 dark:text-charcoal-500" />
-            {vehicle.transmission}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Users size={15} className="text-charcoal-400 dark:text-charcoal-500" />
-            {vehicle.seats} Passengers
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Fuel size={15} className="text-charcoal-400 dark:text-charcoal-500" />
-            {vehicle.fuel_type}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Briefcase size={15} className="text-charcoal-400 dark:text-charcoal-500" />
-            {vehicle.luggage_capacity}
-          </div>
+          {specs.map(({ label, Icon }) => (
+            <div key={label} className="flex items-center gap-1.5">
+              <Icon size={15} className="text-charcoal-400 dark:text-charcoal-500" />
+              {label}
+            </div>
+          ))}
         </dl>
 
-        <div className="mt-5 flex gap-2.5 pt-1">
+        <div className="mt-auto flex gap-2.5 pt-6">
           <Button href={`/fleet/${vehicle.id}`} variant="outline" size="sm" className="flex-1">
             View Details
           </Button>
-          <Button href="#enquiry" size="sm" className="flex-1">
-            Get A Quote
+          <Button href={`/fleet/${vehicle.id}#book`} size="sm" className="flex-1">
+            Select This Car
           </Button>
         </div>
       </div>

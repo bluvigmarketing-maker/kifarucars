@@ -6,6 +6,7 @@ import { approveApplication, rejectApplication } from "@/lib/actions/application
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import type { ApplicationStatus, VehicleApplication } from "@/lib/types";
+import { vehicleTitle } from "@/lib/vehicle-display";
 
 const STATUS_STYLES: Record<ApplicationStatus, string> = {
   pending: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
@@ -26,7 +27,7 @@ export function ApplicationsTable({ applications }: { applications: VehicleAppli
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="font-medium text-charcoal-950 dark:text-white">
-                {application.make} {application.name} &middot; {application.year}
+                {[vehicleTitle(application), application.year].filter(Boolean).join(" · ")}
               </p>
               <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
                 {application.owner_name} &middot; {application.owner_phone} &middot;{" "}
@@ -49,8 +50,9 @@ export function ApplicationsTable({ applications }: { applications: VehicleAppli
 
           <dl className="mt-3 grid grid-cols-2 gap-y-1.5 text-sm text-charcoal-600 dark:text-charcoal-300 sm:grid-cols-4">
             <div>{application.transmission}</div>
-            <div>{application.seats} seats</div>
-            <div>{application.fuel_type}</div>
+            <div>{application.seats ? `${application.seats} seats` : "Seats n/a"}</div>
+            <div>{application.fuel_type || "Fuel n/a"}</div>
+            <div>{application.engine_capacity || "Engine n/a"}</div>
             <div>{application.mileage != null ? `${application.mileage} km` : "Mileage n/a"}</div>
             <div>Chassis: {application.chassis_number || "n/a"}</div>
             <div>Reg: {application.registration_number || "n/a"}</div>

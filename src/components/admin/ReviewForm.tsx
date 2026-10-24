@@ -5,6 +5,7 @@ import { saveReview } from "@/lib/actions/reviews";
 import { Button } from "@/components/ui/Button";
 import type { ReviewFormState } from "@/lib/validations";
 import type { Review, Vehicle } from "@/lib/types";
+import { vehicleTitle } from "@/lib/vehicle-display";
 
 const initialState: ReviewFormState = { status: "idle" };
 
@@ -55,7 +56,7 @@ export function ReviewForm({ review, vehicles = [] }: { review?: Review; vehicle
           <option value="">General review (not tied to a vehicle)</option>
           {vehicles.map((v) => (
             <option key={v.id} value={v.id}>
-              {v.make} {v.name} &middot; {v.year}
+              {[vehicleTitle(v), v.year].filter(Boolean).join(" · ")}
             </option>
           ))}
         </select>
