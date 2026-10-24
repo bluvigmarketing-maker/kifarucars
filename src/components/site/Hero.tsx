@@ -7,28 +7,20 @@ import { BUSINESS } from "@/lib/placeholder-data";
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-charcoal-950 text-white">
+      {/* Desktop: full-bleed photo, nudged right so the SUV sits beside the copy. */}
       <Image
-        src="/images/hero-bg-desktop.png"
-        alt=""
+        src="/images/hero-kifaru.jpg"
+        alt="Black Kifaru SUV with gold trim in front of the Nairobi skyline"
         fill
         priority
         sizes="(min-width: 1024px) 100vw, 10px"
-        className="hidden object-cover lg:block"
+        className="hidden object-cover object-[65%_80%] lg:block"
       />
-      <Image
-        src="/images/hero-bg-mobile.png"
-        alt=""
-        fill
-        priority
-        sizes="(max-width: 1023px) 100vw, 10px"
-        className="object-cover lg:hidden"
-      />
+      <div className="absolute inset-0 hidden bg-charcoal-950/25 lg:block" />
+      <div className="absolute inset-y-0 left-0 hidden w-3/5 bg-gradient-to-r from-charcoal-950 via-charcoal-950/80 to-transparent lg:block" />
+      <div className="absolute inset-0 hidden bg-gradient-to-t from-charcoal-950/70 via-transparent to-transparent lg:block" />
 
-      <div className="absolute inset-0 bg-charcoal-950/55" />
-      <div className="absolute inset-0 bg-gradient-to-r from-charcoal-950 via-charcoal-950/70 to-transparent lg:w-2/3" />
-      <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950/80 via-transparent to-transparent" />
-
-      <Container className="relative py-20 sm:py-28">
+      <Container className="relative pt-16 pb-10 sm:pt-20 lg:py-28">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-widest text-burgundy-400">
             {BUSINESS.tagline}
@@ -78,6 +70,20 @@ export function Hero() {
           </div>
         </div>
       </Container>
+
+      {/* Mobile/tablet: a portrait crop would cut the car in half, so show
+          the whole photo below the copy, faded into the dark background. */}
+      <div className="relative aspect-[1376/768] w-full lg:hidden">
+        <Image
+          src="/images/hero-kifaru.jpg"
+          alt="Black Kifaru SUV with gold trim in front of the Nairobi skyline"
+          fill
+          priority
+          sizes="(max-width: 1023px) 100vw, 10px"
+          className="object-cover"
+        />
+        <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-charcoal-950 to-transparent" />
+      </div>
     </section>
   );
 }
