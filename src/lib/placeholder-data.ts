@@ -15,7 +15,7 @@ export const BUSINESS = {
   googleReviewCount: 120, // PLACEHOLDER
   phone: "+254 721 478 316",
   whatsapp: "254721478316", // no leading +, for wa.me links
-  email: "info@kifarucarhire.example", // PLACEHOLDER
+  email: "info@kifaru.ke",
   locations: ["Nairobi", "Kisumu", "Mombasa", "Nanyuki", "Nakuru"],
 };
 
