@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VehicleCard } from "@/components/site/VehicleCard";
+import { PointerArrow } from "@/components/site/PointerArrow";
 import { cn } from "@/lib/cn";
 import { ENGINE_SOUND_ENABLED } from "@/lib/features";
 import type { PublicVehicle, VehicleCategory } from "@/lib/types";
@@ -282,10 +283,13 @@ export function FleetSection({
           </div>
         )}
 
-        <div className="mt-8 text-center">
-          <Button href="/pricing" variant="outline">
-            View More Options
-          </Button>
+        <div className="mt-14 text-center">
+          <div className="relative inline-block">
+            <PointerArrow label="Check out more here" />
+            <Button href="/pricing" variant="outline">
+              View More Options
+            </Button>
+          </div>
         </div>
       </Container>
     </section>
