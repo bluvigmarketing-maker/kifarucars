@@ -7,12 +7,31 @@ import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { VehicleCard } from "@/components/site/VehicleCard";
 import { cn } from "@/lib/cn";
-import type { PublicVehicle } from "@/lib/types";
+import type { PublicVehicle, VehicleCategory } from "@/lib/types";
 
-export function FleetSection({ vehicles }: { vehicles: PublicVehicle[] }) {
+export function FleetSection({
+  vehicles: allVehicles,
+  categories,
+}: {
+  vehicles: PublicVehicle[];
+  categories: VehicleCategory[];
+}) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
+
+  // Only offer filters for categories that actually have cars listed.
+  const filters = categories.filter((c) => allVehicles.some((v) => v.category_id === c.id));
+  const vehicles = activeCategory
+    ? allVehicles.filter((v) => v.category_id === activeCategory)
+    : allVehicles;
+
+  const selectCategory = (id: string | null) => {
+    setActiveCategory(id);
+    setActiveSlide(0);
+    scrollerRef.current?.scrollTo({ left: 0 });
+  };
 
   const slideTo = (index: number) => {
     const scroller = scrollerRef.current;
@@ -66,7 +85,31 @@ export function FleetSection({ vehicles }: { vehicles: PublicVehicle[] }) {
           </button>
         </div>
 
-        <div className="relative mt-8">
+        {filters.length > 1 ? (
+          <div role="group" aria-label="Filter by category" className="mt-8 flex flex-wrap gap-2">
+            {[{ id: null, name: "All" }, ...filters].map((filter) => {
+              const active = activeCategory === filter.id;
+              return (
+                <button
+                  key={filter.id ?? "all"}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => selectCategory(filter.id)}
+                  className={cn(
+                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                    active
+                      ? "border-burgundy-600 bg-burgundy-600 text-white"
+                      : "border-charcoal-200 text-charcoal-600 hover:border-burgundy-400 hover:text-burgundy-700 dark:border-charcoal-700 dark:text-charcoal-300 dark:hover:border-burgundy-400 dark:hover:text-burgundy-400"
+                  )}
+                >
+                  {filter.name}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
+        <div className={cn("relative", filters.length > 1 ? "mt-6" : "mt-8")}>
           <div
             ref={scrollerRef}
             className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -128,8 +171,8 @@ export function FleetSection({ vehicles }: { vehicles: PublicVehicle[] }) {
         </div>
 
         <div className="mt-8 text-center">
-          <Button href="#enquiry" variant="outline">
-            View All Fleet
+          <Button href="/pricing" variant="outline">
+            View All Rates
           </Button>
         </div>
       </Container>

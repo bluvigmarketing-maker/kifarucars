@@ -1,10 +1,10 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { FleetTable } from "@/components/admin/FleetTable";
-import { listAllVehicles } from "@/lib/admin/data";
+import { listAllCategories, listAllVehicles } from "@/lib/admin/data";
 
 export default async function AdminFleetPage() {
-  const vehicles = await listAllVehicles();
+  const [vehicles, categories] = await Promise.all([listAllVehicles(), listAllCategories()]);
 
   return (
     <div>
@@ -19,7 +19,7 @@ export default async function AdminFleetPage() {
       </div>
 
       <div className="mt-6">
-        <FleetTable vehicles={vehicles} />
+        <FleetTable vehicles={vehicles} categories={categories} />
       </div>
     </div>
   );

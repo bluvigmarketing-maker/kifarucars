@@ -117,6 +117,7 @@ export const VehicleSchema = z.object({
   seats: OptionalSeatsField,
   fuelType: z.string().trim().optional().default(""),
   engineCapacity: z.string().trim().optional().default(""),
+  categoryId: z.string().trim().optional(),
   imageUrl: z.string().trim().optional(),
   price: OptionalPriceField,
   priceUnit: z.preprocess(blankToUndefined, z.enum(["day", "month", "custom"]).optional()),
@@ -137,6 +138,18 @@ export const VehicleSchema = z.object({
 export type VehicleFormState = {
   status: "idle" | "error";
   errors?: Partial<Record<keyof z.infer<typeof VehicleSchema>, string[]>>;
+  message?: string;
+};
+
+export const CategorySchema = z.object({
+  name: z.string().trim().min(1, { error: "Category name is required." }).max(60),
+  description: z.string().trim().max(240).optional().default(""),
+  sortOrder: z.preprocess(blankToUndefined, z.coerce.number().int().min(0).max(9999).optional()),
+});
+
+export type CategoryFormState = {
+  status: "idle" | "error" | "success";
+  errors?: Partial<Record<keyof z.infer<typeof CategorySchema>, string[]>>;
   message?: string;
 };
 

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { VehicleForm } from "@/components/admin/VehicleForm";
-import { getVehicleById } from "@/lib/admin/data";
+import { getVehicleById, listAllCategories } from "@/lib/admin/data";
 
 export default async function EditVehiclePage({
   params,
 }: PageProps<"/kifaruadmin/fleet/[id]">) {
   const { id } = await params;
-  const vehicle = await getVehicleById(id);
+  const [vehicle, categories] = await Promise.all([getVehicleById(id), listAllCategories()]);
 
   if (!vehicle) notFound();
 
@@ -14,7 +14,7 @@ export default async function EditVehiclePage({
     <div>
       <h1 className="font-display text-2xl text-charcoal-950 dark:text-white">Edit Vehicle</h1>
       <div className="mt-6">
-        <VehicleForm vehicle={vehicle} />
+        <VehicleForm vehicle={vehicle} categories={categories} />
       </div>
     </div>
   );

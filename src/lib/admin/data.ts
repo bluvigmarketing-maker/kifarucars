@@ -10,6 +10,7 @@ import type {
   Review,
   Vehicle,
   VehicleApplication,
+  VehicleCategory,
 } from "@/lib/types";
 
 const LEASE_RELATIONS_SELECT = "*, client:clients(*), vehicle:vehicles(id, name, make, year, image_url)";
@@ -21,6 +22,16 @@ export async function listAllVehicles(): Promise<Vehicle[]> {
     .select("*")
     .order("sort_order", { ascending: true });
   return (data ?? []) as Vehicle[];
+}
+
+export async function listAllCategories(): Promise<VehicleCategory[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("vehicle_categories")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+  return (data ?? []) as VehicleCategory[];
 }
 
 export async function getVehicleById(id: string): Promise<Vehicle | null> {

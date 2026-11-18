@@ -1,13 +1,13 @@
 import "server-only";
 import { isSupabaseConfigured } from "./supabase/env";
 import { createClient } from "./supabase/server";
-import { PLACEHOLDER_REVIEWS, PLACEHOLDER_VEHICLES } from "./placeholder-data";
-import type { PublicVehicle, Review, UnavailableRange, Vehicle } from "./types";
+import { PLACEHOLDER_CATEGORIES, PLACEHOLDER_REVIEWS, PLACEHOLDER_VEHICLES } from "./placeholder-data";
+import type { PublicVehicle, Review, UnavailableRange, Vehicle, VehicleCategory } from "./types";
 
 // Columns safe to send to the browser — excludes ownership/document data
 // that's staff-only in the admin dashboard (see PublicVehicle in types.ts).
 const PUBLIC_VEHICLE_COLUMNS =
-  "id, name, make, year, transmission, seats, fuel_type, engine_capacity, luggage_capacity, mileage, additional_features, image_url, price, price_unit, price_custom_label, gallery_urls, video_url, hover_sound_url, is_available, sort_order, created_at";
+  "id, name, make, year, transmission, seats, fuel_type, engine_capacity, luggage_capacity, mileage, additional_features, image_url, price, price_unit, price_custom_label, category_id, gallery_urls, video_url, hover_sound_url, is_available, sort_order, created_at";
 
 // Strips staff-only fields before a Vehicle is sent to a client component —
 // used for the placeholder fallback, which is otherwise shaped like the full
@@ -29,6 +29,7 @@ function toPublicVehicle(vehicle: Vehicle): PublicVehicle {
     price: vehicle.price,
     price_unit: vehicle.price_unit,
     price_custom_label: vehicle.price_custom_label,
+    category_id: vehicle.category_id,
     gallery_urls: vehicle.gallery_urls,
     video_url: vehicle.video_url,
     hover_sound_url: vehicle.hover_sound_url,
@@ -38,18 +39,37 @@ function toPublicVehicle(vehicle: Vehicle): PublicVehicle {
   };
 }
 
-export async function getVehicles(): Promise<PublicVehicle[]> {
-  if (!isSupabaseConfigured) return PLACEHOLDER_VEHICLES.map(toPublicVehicle);
+// Public vehicles plus the categories that group them (homepage filters,
+// /pricing). When the placeholder fleet is shown, the placeholder
+// categories come with it so every category_id resolves.
+export async function getFleet(): Promise<{ vehicles: PublicVehicle[]; categories: VehicleCategory[] }> {
+  const placeholder = {
+    vehicles: PLACEHOLDER_VEHICLES.map(toPublicVehicle),
+    categories: PLACEHOLDER_CATEGORIES,
+  };
+  if (!isSupabaseConfigured) return placeholder;
 
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("vehicles")
-    .select(PUBLIC_VEHICLE_COLUMNS)
-    .eq("is_available", true)
-    .order("sort_order", { ascending: true });
+  const [vehiclesResult, categoriesResult] = await Promise.all([
+    supabase
+      .from("vehicles")
+      .select(PUBLIC_VEHICLE_COLUMNS)
+      .eq("is_available", true)
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("vehicle_categories")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+  ]);
 
-  if (error || !data || data.length === 0) return PLACEHOLDER_VEHICLES.map(toPublicVehicle);
-  return data as PublicVehicle[];
+  const { data, error } = vehiclesResult;
+  if (error || !data || data.length === 0) return placeholder;
+  return {
+    vehicles: data as PublicVehicle[],
+    // Missing table (0011 not run yet) just means no grouping.
+    categories: (categoriesResult.data ?? []) as VehicleCategory[],
+  };
 }
 
 export async function getVehicleForDetail(id: string): Promise<PublicVehicle | null> {

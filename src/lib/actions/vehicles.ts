@@ -21,6 +21,7 @@ export async function saveVehicle(
     seats: formData.get("seats"),
     fuelType: formData.get("fuelType"),
     engineCapacity: formData.get("engineCapacity"),
+    categoryId: formData.get("categoryId") ?? undefined,
     imageUrl: formData.get("imageUrl") ?? undefined,
     price: formData.get("price"),
     priceUnit: formData.get("priceUnit"),
@@ -56,6 +57,7 @@ export async function saveVehicle(
     seats: validated.data.seats ?? null,
     fuel_type: validated.data.fuelType,
     engine_capacity: validated.data.engineCapacity,
+    category_id: validated.data.categoryId || null,
     image_url: validated.data.imageUrl || FALLBACK_VEHICLE_IMAGE,
     price: price ?? null,
     price_unit: price != null || priceUnit === "custom" ? (priceUnit ?? null) : null,
@@ -84,6 +86,7 @@ export async function saveVehicle(
 
   revalidatePath("/kifaruadmin/fleet");
   revalidatePath("/");
+  revalidatePath("/pricing");
   if (typeof id === "string" && id.length > 0) revalidatePath(`/fleet/${id}`);
   redirect("/kifaruadmin/fleet");
 }
@@ -94,6 +97,7 @@ export async function deleteVehicle(id: string) {
   await supabase.from("vehicles").delete().eq("id", id);
   revalidatePath("/kifaruadmin/fleet");
   revalidatePath("/");
+  revalidatePath("/pricing");
 }
 
 export async function toggleVehicleAvailability(id: string, nextValue: boolean) {
@@ -102,4 +106,5 @@ export async function toggleVehicleAvailability(id: string, nextValue: boolean) 
   await supabase.from("vehicles").update({ is_available: nextValue }).eq("id", id);
   revalidatePath("/kifaruadmin/fleet");
   revalidatePath("/");
+  revalidatePath("/pricing");
 }

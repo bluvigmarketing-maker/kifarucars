@@ -12,6 +12,7 @@ import {
   LogOut,
   MessageSquare,
   Star,
+  Tags,
   Wallet,
 } from "lucide-react";
 import { logout } from "@/lib/actions/admin-auth";
@@ -21,6 +22,7 @@ import { cn } from "@/lib/cn";
 export const NAV_ITEMS = [
   { label: "Overview", href: "/kifaruadmin", Icon: LayoutDashboard },
   { label: "Fleet", href: "/kifaruadmin/fleet", Icon: Car },
+  { label: "Categories", href: "/kifaruadmin/categories", Icon: Tags },
   { label: "Bookings", href: "/kifaruadmin/bookings", Icon: CalendarCheck },
   { label: "Applications", href: "/kifaruadmin/applications", Icon: ClipboardList },
   { label: "Lease records", href: "/kifaruadmin/leases", Icon: FileClock },

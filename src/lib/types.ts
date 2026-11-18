@@ -1,5 +1,15 @@
 export type PriceUnit = "day" | "month" | "custom";
 
+// Managed from /kifaruadmin/categories — groups the fleet slider filters
+// and the /pricing page.
+export type VehicleCategory = {
+  id: string;
+  name: string;
+  description: string;
+  sort_order: number;
+  created_at: string;
+};
+
 export type Vehicle = {
   id: string;
   // Every descriptive field is optional when adding a vehicle — blank text
@@ -18,6 +28,8 @@ export type Vehicle = {
   price: number | null;
   price_unit: PriceUnit | null;
   price_custom_label: string | null;
+  // Null when uncategorised (or its category was deleted).
+  category_id: string | null;
   is_available: boolean;
   sort_order: number;
   created_at: string;
