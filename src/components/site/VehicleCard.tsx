@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Cog, Fuel, Settings2, Users, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useEngineSound } from "@/hooks/useEngineSound";
+import { VEHICLE_VIDEO_ENABLED } from "@/lib/features";
 import type { PublicVehicle } from "@/lib/types";
 import { vehicleSubtitle, vehicleTitle } from "@/lib/vehicle-display";
 
@@ -59,7 +60,7 @@ export function VehicleCard({
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        {vehicle.video_url ? (
+        {VEHICLE_VIDEO_ENABLED && vehicle.video_url ? (
           <video
             ref={videoRef}
             src={vehicle.video_url}

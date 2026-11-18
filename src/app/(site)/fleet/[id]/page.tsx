@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { BookingPanel } from "@/components/site/BookingPanel";
 import { VehicleGallery } from "@/components/site/VehicleGallery";
 import { getReviewsForVehicle, getUnavailableRanges, getVehicleForDetail } from "@/lib/data";
+import { VEHICLE_VIDEO_ENABLED } from "@/lib/features";
 import { isMpesaConfigured } from "@/lib/mpesa/daraja";
 import { isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { vehicleSubtitle, vehicleTitle } from "@/lib/vehicle-display";
@@ -53,7 +54,7 @@ export default async function VehicleDetailPage({ params }: PageProps<"/fleet/[i
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           <VehicleGallery
             images={[vehicle.image_url, ...vehicle.gallery_urls]}
-            videoUrl={vehicle.video_url}
+            videoUrl={VEHICLE_VIDEO_ENABLED ? vehicle.video_url : null}
             alt={title}
           />
 
