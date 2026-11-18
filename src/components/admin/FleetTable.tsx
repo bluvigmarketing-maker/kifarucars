@@ -5,11 +5,12 @@ import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 import { deleteVehicle, toggleVehicleAvailability } from "@/lib/actions/vehicles";
 import { cn } from "@/lib/cn";
-import type { Vehicle } from "@/lib/types";
+import type { Vehicle, VehicleCategory } from "@/lib/types";
 import { formatPriceText, vehicleSubtitle, vehicleTitle } from "@/lib/vehicle-display";
 
-export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
+export function FleetTable({ vehicles, categories }: { vehicles: Vehicle[]; categories: VehicleCategory[] }) {
   const [isPending, startTransition] = useTransition();
+  const categoryNames = new Map(categories.map((c) => [c.id, c.name]));
 
   return (
     <div className="overflow-x-auto rounded-2xl border-2 border-gold-500/60 bg-white shadow-[0_0_18px_-6px_rgba(201,162,39,0.45)] dark:border-gold-400/50 dark:shadow-[0_0_18px_-6px_rgba(212,185,106,0.35)] dark:bg-charcoal-900">
@@ -17,6 +18,7 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
         <thead className="border-b border-charcoal-100 text-xs uppercase tracking-wide text-charcoal-500 dark:border-charcoal-800 dark:text-charcoal-400">
           <tr>
             <th className="px-5 py-3">Vehicle</th>
+            <th className="px-5 py-3">Category</th>
             <th className="px-5 py-3">Seats</th>
             <th className="px-5 py-3">Price</th>
             <th className="px-5 py-3">Status</th>
@@ -29,6 +31,9 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
               <td className="px-5 py-3.5">
                 <p className="font-medium text-charcoal-950 dark:text-white">{vehicle.name || vehicleTitle(vehicle)}</p>
                 <p className="text-xs text-charcoal-500 dark:text-charcoal-400">{vehicleSubtitle(vehicle)}</p>
+              </td>
+              <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">
+                {(vehicle.category_id && categoryNames.get(vehicle.category_id)) || "—"}
               </td>
               <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">{vehicle.seats ?? "—"}</td>
               <td className="px-5 py-3.5 text-charcoal-700 dark:text-charcoal-300">
@@ -79,7 +84,7 @@ export function FleetTable({ vehicles }: { vehicles: Vehicle[] }) {
           ))}
           {vehicles.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-5 py-10 text-center text-charcoal-500 dark:text-charcoal-400">
+              <td colSpan={6} className="px-5 py-10 text-center text-charcoal-500 dark:text-charcoal-400">
                 No vehicles yet — add your first one.
               </td>
             </tr>

@@ -8,6 +8,7 @@ import { NewsletterForm } from "@/components/site/NewsletterForm";
 const FOOTER_LINKS = [
   { label: "Home", href: "/" },
   { label: "Our Fleet", href: "/#fleet" },
+  { label: "Pricing", href: "/pricing" },
   { label: "About Us", href: "/#about" },
   { label: "Corporate Leasing", href: "/corporate-leasing" },
   { label: "Contact Us", href: "/#enquiry" },

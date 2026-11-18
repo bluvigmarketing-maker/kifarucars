@@ -3,7 +3,7 @@
  * admin dashboard (/kifaruadmin) or the business supplies real copy. Search
  * this file's exports to find everything that still needs replacing.
  */
-import type { Review, Vehicle } from "./types";
+import type { Review, Vehicle, VehicleCategory } from "./types";
 
 export const BUSINESS = {
   name: "Kifaru Car Hire",
@@ -15,6 +15,7 @@ export const BUSINESS = {
   googleReviewCount: 120, // PLACEHOLDER
   phone: "+254 721 478 316",
   whatsapp: "254721478316", // no leading +, for wa.me links
+  salesPhone: "+254 790 520 765",
   email: "info@kifaru.ke",
   locations: ["Nairobi", "Kisumu", "Mombasa", "Nanyuki", "Nakuru"],
 };
@@ -46,83 +47,56 @@ const PLACEHOLDER_VEHICLE_STAFF_FIELDS: Pick<
   hover_sound_url: null,
 };
 
+// Mirrors supabase/migrations/0011_vehicle_categories.sql.
+export const PLACEHOLDER_CATEGORIES: VehicleCategory[] = [
+  { id: "cat-luxury", name: "Luxury SUV", description: "Top-of-the-range comfort for VIP and executive travel.", sort_order: 1, created_at: new Date().toISOString() },
+  { id: "cat-prado", name: "Land Cruiser Prado", description: "Our signature Prado fleet — rugged, comfortable, built for Kenyan roads.", sort_order: 2, created_at: new Date().toISOString() },
+  { id: "cat-midsize", name: "Mid-Size SUV", description: "Capable seven-seaters for families and upcountry trips.", sort_order: 3, created_at: new Date().toISOString() },
+  { id: "cat-crossover", name: "Crossover", description: "Economical, easy-to-drive SUVs for town and highway.", sort_order: 4, created_at: new Date().toISOString() },
+];
+
+// The rate card ("Kifaru_Car_Hire Rates.pdf") — mirrors
+// supabase/migrations/0012_seed_rate_card_fleet.sql. Daily rates and
+// photos are real; other specs are left blank until staff fill them in.
+function rateCardVehicle(
+  id: string,
+  make: string,
+  name: string,
+  fuelType: string,
+  price: number,
+  image: string,
+  categoryId: string,
+  sortOrder: number
+): Vehicle {
+  return {
+    id,
+    name,
+    make,
+    year: null,
+    transmission: "Automatic",
+    seats: null,
+    fuel_type: fuelType,
+    engine_capacity: "",
+    luggage_capacity: "",
+    image_url: `/vehicles/${image}.jpg`,
+    price,
+    price_unit: "day",
+    price_custom_label: null,
+    category_id: categoryId,
+    is_available: true,
+    sort_order: sortOrder,
+    created_at: new Date().toISOString(),
+    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
+  };
+}
+
 export const PLACEHOLDER_VEHICLES: Vehicle[] = [
-  {
-    id: "ph-1",
-    name: "Land Cruiser Prado",
-    make: "Toyota",
-    year: 2023,
-    transmission: "Automatic",
-    seats: 7,
-    fuel_type: "Diesel",
-    engine_capacity: "2,800cc", // PLACEHOLDER
-    luggage_capacity: "3 Big, 2 Small",
-    image_url: "/vehicles/placeholder-suv.svg",
-    price: 12000, // PLACEHOLDER
-    price_unit: "day",
-    price_custom_label: null,
-    is_available: true,
-    sort_order: 1,
-    created_at: new Date().toISOString(),
-    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
-  },
-  {
-    id: "ph-2",
-    name: "Land Cruiser Prado",
-    make: "Toyota",
-    year: 2022,
-    transmission: "Automatic",
-    seats: 7,
-    fuel_type: "Diesel",
-    engine_capacity: "2,800cc", // PLACEHOLDER
-    luggage_capacity: "3 Big, 2 Small",
-    image_url: "/vehicles/placeholder-suv.svg",
-    price: 12000, // PLACEHOLDER
-    price_unit: "day",
-    price_custom_label: null,
-    is_available: true,
-    sort_order: 2,
-    created_at: new Date().toISOString(),
-    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
-  },
-  {
-    id: "ph-3",
-    name: "Land Cruiser Prado",
-    make: "Toyota",
-    year: 2021,
-    transmission: "Manual",
-    seats: 7,
-    fuel_type: "Diesel",
-    engine_capacity: "2,800cc", // PLACEHOLDER
-    luggage_capacity: "3 Big, 2 Small",
-    image_url: "/vehicles/placeholder-suv.svg",
-    price: 12000, // PLACEHOLDER
-    price_unit: "day",
-    price_custom_label: null,
-    is_available: true,
-    sort_order: 3,
-    created_at: new Date().toISOString(),
-    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
-  },
-  {
-    id: "ph-4",
-    name: "Land Cruiser Prado",
-    make: "Toyota",
-    year: 2020,
-    transmission: "Automatic",
-    seats: 5,
-    fuel_type: "Petrol",
-    engine_capacity: "2,700cc", // PLACEHOLDER
-    luggage_capacity: "2 Big, 2 Small",
-    image_url: "/vehicles/placeholder-suv.svg",
-    price: 12000, // PLACEHOLDER
-    price_unit: "day",
-    price_custom_label: null,
-    is_available: true,
-    sort_order: 4,
-    created_at: new Date().toISOString(),
-    ...PLACEHOLDER_VEHICLE_STAFF_FIELDS,
-  },
+  rateCardVehicle("ph-1", "Lexus", "LX 570", "", 22500, "lexus-lx-570", "cat-luxury", 1),
+  rateCardVehicle("ph-2", "Toyota", "Prado VXL (Diesel)", "Diesel", 15000, "toyota-prado-vxl-diesel", "cat-prado", 2),
+  rateCardVehicle("ph-3", "Toyota", "Prado VXL (Petrol)", "Petrol", 14000, "toyota-prado-vxl-petrol", "cat-prado", 3),
+  rateCardVehicle("ph-4", "Toyota", "Land Cruiser Prado TX", "", 13000, "toyota-prado-tx", "cat-prado", 4),
+  rateCardVehicle("ph-5", "Toyota", "Fortuner", "", 13000, "toyota-fortuner", "cat-midsize", 5),
+  rateCardVehicle("ph-6", "Mazda", "CX-5", "", 8500, "mazda-cx-5", "cat-crossover", 6),
 ];
 
 export const PLACEHOLDER_REVIEWS: Review[] = [
@@ -165,7 +139,7 @@ export const FAQS = [
   {
     question: "What types of vehicles do you offer?",
     answer:
-      "We specialize exclusively in the Toyota Land Cruiser Prado — a rugged, comfortable SUV well-suited to Kenyan roads and long-distance travel. We maintain several Prado units across different model years so there's always one available for your dates.",
+      "Our fleet is built around the Toyota Land Cruiser Prado (VXL diesel, VXL petrol and TX), alongside the Lexus LX 570, Toyota Fortuner and Mazda CX-5. See our pricing page for daily rates on every vehicle.",
   },
   {
     question: "Do you own and maintain your fleet?",

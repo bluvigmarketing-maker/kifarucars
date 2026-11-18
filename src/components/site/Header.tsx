@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { label: "Corporate Car Hire", href: "/#fleet" },
   { label: "Corporate Leasing", href: "/corporate-leasing" },
   { label: "Our Fleet", href: "/#fleet" },
+  { label: "Pricing", href: "/pricing" },
   { label: "About Us", href: "/#about" },
   { label: "Contact Us", href: "/#enquiry" },
   { label: "List Your Car", href: "/list-your-car", icon: true },

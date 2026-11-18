@@ -11,7 +11,7 @@ import {
 } from "@/components/admin/VehicleMediaFields";
 import type { VehicleFormState } from "@/lib/validations";
 import { cn } from "@/lib/cn";
-import type { PriceUnit, Vehicle } from "@/lib/types";
+import type { PriceUnit, Vehicle, VehicleCategory } from "@/lib/types";
 
 const initialState: VehicleFormState = { status: "idle" };
 
@@ -91,7 +91,7 @@ function PriceField({ vehicle, error }: { vehicle?: Vehicle; error?: string }) {
   );
 }
 
-export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
+export function VehicleForm({ vehicle, categories }: { vehicle?: Vehicle; categories: VehicleCategory[] }) {
   const [state, formAction, pending] = useActionState(saveVehicle, initialState);
   const errors = state.status === "error" ? state.errors : undefined;
 
@@ -109,6 +109,23 @@ export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
           <label className={labelClasses}>Make</label>
           <input name="make" defaultValue={vehicle?.make} className={inputClasses} placeholder="e.g. Toyota" />
           {errors?.make ? <p className="mt-1 text-xs text-burgundy-600">{errors.make[0]}</p> : null}
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClasses}>Category</label>
+          <select name="categoryId" defaultValue={vehicle?.category_id ?? ""} className={inputClasses}>
+            <option value="">No category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-charcoal-500 dark:text-charcoal-400">
+            Groups the car on the homepage filters and the pricing page.{" "}
+            <a href="/kifaruadmin/categories" className="underline hover:text-burgundy-700">
+              Manage categories
+            </a>
+          </p>
         </div>
         <div>
           <label className={labelClasses}>Year</label>
