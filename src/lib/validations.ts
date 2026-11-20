@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { MAX_EXTRA_QUANTITY } from "./vehicle-display";
 
 export const EnquirySchema = z.object({
   firstName: z.string().trim().min(1, { error: "First name is required." }),
@@ -152,6 +153,49 @@ export type CategoryFormState = {
   errors?: Partial<Record<keyof z.infer<typeof CategorySchema>, string[]>>;
   message?: string;
 };
+
+export const ExtraSchema = z.object({
+  name: z.string().trim().min(1, { error: "Name is required." }).max(80),
+  description: z.string().trim().max(240).optional().default(""),
+  price: z.preprocess(
+    blankToUndefined,
+    z.coerce.number({ error: "Enter a price." }).min(0, { error: "Enter a valid price." })
+  ),
+  imageUrl: z.string().trim().optional(),
+  isActive: z.coerce.boolean().optional(),
+  sortOrder: z.preprocess(blankToUndefined, z.coerce.number().int().min(0).max(9999).optional()),
+});
+
+export type ExtraFormState = {
+  status: "idle" | "error" | "success";
+  errors?: Partial<Record<keyof z.infer<typeof ExtraSchema>, string[]>>;
+  message?: string;
+};
+
+// Extras picked on the booking form, sent as JSON: [{ id, quantity }].
+// Prices are never taken from the form — they're re-read from the menu.
+export const BookingExtrasField = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => {
+    if (!value) return [];
+    try {
+      const parsed: unknown = JSON.parse(value);
+      if (!Array.isArray(parsed)) return [];
+      const picks = new Map<string, number>();
+      for (const item of parsed) {
+        const id = typeof item?.id === "string" ? item.id : null;
+        const quantity = Number(item?.quantity);
+        if (id && Number.isInteger(quantity) && quantity >= 1) {
+          picks.set(id, Math.min(quantity, MAX_EXTRA_QUANTITY));
+        }
+      }
+      return [...picks].map(([id, quantity]) => ({ id, quantity }));
+    } catch {
+      return [];
+    }
+  });
 
 // Vehicle details are all optional; only the owner's contact details are
 // required, so staff can follow up.

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { CalendarDays, Trash2 } from "lucide-react";
+import { CalendarDays, ShoppingBag, Trash2 } from "lucide-react";
 import { deleteBooking, updateBookingStatus } from "@/lib/actions/bookings";
 import { daysInclusive, formatDisplayDate } from "@/lib/booking-dates";
 import { cn } from "@/lib/cn";
@@ -26,6 +26,8 @@ export function BookingsTable({ bookings, emptyMessage }: { bookings: BookingWit
       {bookings.map((booking) => {
         const days = daysInclusive(booking.start_date, booking.end_date);
         const paid = booking.payments.find((p) => p.status === "paid");
+        const extras = booking.extras ?? [];
+        const extrasTotal = extras.reduce((sum, e) => sum + Number(e.unit_price) * e.quantity, 0);
         return (
           <div
             key={booking.id}
@@ -115,6 +117,25 @@ export function BookingsTable({ bookings, emptyMessage }: { bookings: BookingWit
                   </span>
               )}
             </div>
+
+            {extras.length > 0 ? (
+              <div className="mt-3 rounded-lg border border-gold-500/40 bg-gold-300/10 px-4 py-3 text-sm dark:border-gold-400/30">
+                <p className="flex items-center gap-1.5 font-medium text-charcoal-950 dark:text-white">
+                  <ShoppingBag size={15} className="text-gold-600 dark:text-gold-400" />
+                  Extras to prepare — collect {formatKes(extrasTotal)} at pickup
+                </p>
+                <ul className="mt-1.5 space-y-0.5 text-charcoal-700 dark:text-charcoal-300">
+                  {extras.map((extra, i) => (
+                    <li key={i} className="flex justify-between gap-4">
+                      <span>
+                        {extra.quantity} × {extra.name}
+                      </span>
+                      <span className="tabular-nums">{formatKes(Number(extra.unit_price) * extra.quantity)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             {booking.notes ? (
               <p className="mt-3 text-sm text-charcoal-700 dark:text-charcoal-300">{booking.notes}</p>

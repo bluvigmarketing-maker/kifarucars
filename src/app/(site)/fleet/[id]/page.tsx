@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { BookingPanel } from "@/components/site/BookingPanel";
 import { VehicleGallery } from "@/components/site/VehicleGallery";
-import { getReviewsForVehicle, getUnavailableRanges, getVehicleForDetail } from "@/lib/data";
+import { getActiveExtras, getReviewsForVehicle, getUnavailableRanges, getVehicleForDetail } from "@/lib/data";
 import { VEHICLE_VIDEO_ENABLED } from "@/lib/features";
 import { isMpesaConfigured } from "@/lib/mpesa/daraja";
 import { isServiceRoleConfigured } from "@/lib/supabase/admin";
@@ -29,10 +29,11 @@ export async function generateMetadata({
 
 export default async function VehicleDetailPage({ params }: PageProps<"/fleet/[id]">) {
   const { id } = await params;
-  const [vehicle, reviews, unavailable] = await Promise.all([
+  const [vehicle, reviews, unavailable, extras] = await Promise.all([
     getVehicleForDetail(id),
     getReviewsForVehicle(id),
     getUnavailableRanges(id),
+    getActiveExtras(),
   ]);
 
   if (!vehicle) notFound();
@@ -115,6 +116,7 @@ export default async function VehicleDetailPage({ params }: PageProps<"/fleet/[i
               vehicle={vehicle}
               unavailable={unavailable}
               onlinePayment={isMpesaConfigured && isServiceRoleConfigured}
+              extras={extras}
             />
           </div>
         </section>

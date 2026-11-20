@@ -17,9 +17,11 @@ const GALLERY_MAX = 9; // + 1 cover image = 10 total
 export function CoverImageField({
   defaultValue,
   error,
+  label = "Cover image",
 }: {
   defaultValue?: string;
   error?: string;
+  label?: string;
 }) {
   const id = useId();
   const [value, setValue] = useState(defaultValue ?? "");
@@ -28,7 +30,7 @@ export function CoverImageField({
 
   return (
     <div>
-      <label className={labelClasses}>Cover image</label>
+      <label className={labelClasses}>{label}</label>
       <div className="mt-1.5 flex gap-2">
         <input
           name="imageUrl"

@@ -2,7 +2,7 @@ import "server-only";
 import { isSupabaseConfigured } from "./supabase/env";
 import { createClient } from "./supabase/server";
 import { PLACEHOLDER_CATEGORIES, PLACEHOLDER_REVIEWS, PLACEHOLDER_VEHICLES } from "./placeholder-data";
-import type { PublicVehicle, Review, UnavailableRange, Vehicle, VehicleCategory } from "./types";
+import type { PublicExtra, PublicVehicle, Review, UnavailableRange, Vehicle, VehicleCategory } from "./types";
 
 // Columns safe to send to the browser — excludes ownership/document data
 // that's staff-only in the admin dashboard (see PublicVehicle in types.ts).
@@ -133,4 +133,21 @@ export async function getUnavailableRanges(vehicleId: string): Promise<Unavailab
 
   if (error || !data) return [];
   return data as UnavailableRange[];
+}
+
+// The extras menu on the booking panel (drinks etc., paid at pickup).
+// Empty until migration 0013 is run and staff add items.
+export async function getActiveExtras(): Promise<PublicExtra[]> {
+  if (!isSupabaseConfigured) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("extras")
+    .select("id, name, description, price, image_url")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+
+  if (error || !data) return [];
+  return data.map((e) => ({ ...e, price: Number(e.price) })) as PublicExtra[];
 }

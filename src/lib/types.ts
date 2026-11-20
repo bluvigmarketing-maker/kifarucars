@@ -195,6 +195,35 @@ export type Booking = {
 export type BookingWithVehicle = Booking & {
   vehicle: Pick<Vehicle, "id" | "name" | "make" | "year">;
   payments: Pick<Payment, "amount" | "status" | "mpesa_receipt">[];
+  extras: Pick<BookingExtra, "name" | "unit_price" | "quantity">[];
+};
+
+// An item on the extras menu (/kifaruadmin/extras) — drinks, snacks,
+// accessories a client can add to a booking and pay for at pickup.
+export type Extra = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+};
+
+// What the booking panel needs to show the menu.
+export type PublicExtra = Pick<Extra, "id" | "name" | "description" | "price" | "image_url">;
+
+// An extra picked on a booking. name/unit_price are copied from the menu
+// when booked, so later menu edits don't change what's owed.
+export type BookingExtra = {
+  id: string;
+  booking_id: string;
+  extra_id: string | null;
+  name: string;
+  unit_price: number;
+  quantity: number;
+  created_at: string;
 };
 
 // A blocked date range on the public calendar (inclusive, YYYY-MM-DD) —

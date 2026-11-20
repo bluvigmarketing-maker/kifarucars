@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState, useTransition } from "react";
 import { CheckCircle2, Loader2, Phone, Smartphone, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BookingCalendar, type DateRange } from "@/components/site/BookingCalendar";
+import { ExtrasPicker, selectedExtras, type ExtraQuantities } from "@/components/site/ExtrasPicker";
 import { getBookingPaymentStatus, retryBookingPayment, submitBooking } from "@/lib/actions/bookings";
 import { daysInclusive, formatDisplayDate } from "@/lib/booking-dates";
 import { cn } from "@/lib/cn";
@@ -17,7 +18,7 @@ import {
   vehicleTitle,
 } from "@/lib/vehicle-display";
 import type { BookingFormState } from "@/lib/validations";
-import type { PaymentStatus, PublicVehicle, UnavailableRange } from "@/lib/types";
+import type { PaymentStatus, PublicExtra, PublicVehicle, UnavailableRange } from "@/lib/types";
 
 const initialState: BookingFormState = { status: "idle" };
 
@@ -35,6 +36,8 @@ type Props = {
   unavailable: UnavailableRange[];
   // M-Pesa + service role configured — otherwise nothing can be booked online.
   onlinePayment: boolean;
+  // Drinks etc. the client can add, paid at pickup.
+  extras: PublicExtra[];
 };
 
 // Remounting on "change dates" resets the form action's state too.
@@ -63,12 +66,14 @@ function DateTile({ label, value, active }: { label: string; value: string | nul
   );
 }
 
-function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props & { onStartOver: () => void }) {
+function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver }: Props & { onStartOver: () => void }) {
   const [submitState, formAction, submitting] = useActionState(submitBooking, initialState);
   const [retryState, setRetryState] = useState<BookingFormState | null>(null);
   const [retrying, startRetry] = useTransition();
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   const [email, setEmail] = useState("");
+  const [extraQuantities, setExtraQuantities] = useState<ExtraQuantities>({});
+  const pickedExtras = selectedExtras(extras, extraQuantities);
   const [outcome, setOutcome] = useState<{ paymentId: string; status: PaymentStatus | "timeout" } | null>(null);
 
   // The latest attempt wins: a retry's result replaces the original submit's.
@@ -129,6 +134,12 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
             Your PDF invoice is on its way to <span className="font-medium">{email}</span>. We&apos;ll be in touch
             to arrange pick-up.
           </p>
+          {pickedExtras.total > 0 ? (
+            <p className="mt-2 text-sm text-charcoal-600 dark:text-charcoal-300">
+              Your extras ({pickedExtras.lines.map((l) => `${l.quantity}× ${l.name}`).join(", ")}) will be ready
+              with the car — please pay {formatKes(pickedExtras.total)} for them at pickup.
+            </p>
+          ) : null}
         </div>
       </div>
     );
@@ -147,6 +158,11 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
         {dates ? <p className="text-charcoal-600 dark:text-charcoal-300">{dates}</p> : null}
         {quote ? (
           <p className="mt-1 font-semibold text-charcoal-950 dark:text-white">{formatKes(quote.total)}</p>
+        ) : null}
+        {pickedExtras.total > 0 ? (
+          <p className="mt-1 text-xs text-charcoal-500 dark:text-charcoal-400">
+            + {formatKes(pickedExtras.total)} extras, paid at pickup
+          </p>
         ) : null}
       </div>
 
@@ -236,6 +252,11 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
             <input type="hidden" name="vehicleId" value={vehicle.id} />
             <input type="hidden" name="startDate" value={range.start ?? ""} />
             <input type="hidden" name="endDate" value={range.end ?? ""} />
+            <input
+              type="hidden"
+              name="extras"
+              value={JSON.stringify(pickedExtras.lines.map((l) => ({ id: l.id, quantity: l.quantity })))}
+            />
 
             {price ? (
               <p className="text-charcoal-600 dark:text-charcoal-300">
@@ -302,6 +323,8 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, onStartOver }: Props
                 </p>
               ) : null}
             </div>
+
+            <ExtrasPicker extras={extras} quantities={extraQuantities} onChange={setExtraQuantities} />
 
             <div className="space-y-4">
               <div>

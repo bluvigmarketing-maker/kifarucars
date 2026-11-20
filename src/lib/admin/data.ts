@@ -11,6 +11,7 @@ import type {
   Vehicle,
   VehicleApplication,
   VehicleCategory,
+  Extra,
 } from "@/lib/types";
 
 const LEASE_RELATIONS_SELECT = "*, client:clients(*), vehicle:vehicles(id, name, make, year, image_url)";
@@ -32,6 +33,16 @@ export async function listAllCategories(): Promise<VehicleCategory[]> {
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
   return (data ?? []) as VehicleCategory[];
+}
+
+export async function listAllExtras(): Promise<Extra[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("extras")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+  return (data ?? []) as Extra[];
 }
 
 export async function getVehicleById(id: string): Promise<Vehicle | null> {
@@ -136,7 +147,22 @@ export async function listAllBookings(): Promise<BookingWithVehicle[]> {
     .from("bookings")
     .select("*, vehicle:vehicles(id, name, make, year), payments(amount, status, mpesa_receipt)")
     .order("created_at", { ascending: false });
-  return (data ?? []) as BookingWithVehicle[];
+  const bookings = (data ?? []) as Omit<BookingWithVehicle, "extras">[];
+  if (bookings.length === 0) return [];
+
+  // Extras fetched separately so the bookings list still loads if this
+  // query fails (e.g. migration 0013 not run yet).
+  const { data: extras } = await supabase
+    .from("booking_extras")
+    .select("booking_id, name, unit_price, quantity")
+    .in("booking_id", bookings.map((b) => b.id));
+  const byBooking = new Map<string, BookingWithVehicle["extras"]>();
+  for (const extra of extras ?? []) {
+    const list = byBooking.get(extra.booking_id) ?? [];
+    list.push({ name: extra.name, unit_price: Number(extra.unit_price), quantity: extra.quantity });
+    byBooking.set(extra.booking_id, list);
+  }
+  return bookings.map((b) => ({ ...b, extras: byBooking.get(b.id) ?? [] }));
 }
 
 export async function getDashboardStats() {

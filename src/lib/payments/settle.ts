@@ -7,7 +7,7 @@ import { buildInvoicePdf, formatInvoiceDate, type InvoiceData, type InvoiceLine 
 import { formatKes } from "@/lib/payments/balance";
 import { BUSINESS } from "@/lib/placeholder-data";
 import { DISCOUNT_MIN_DAYS, vehicleTitle } from "@/lib/vehicle-display";
-import type { Booking, Client, ExtensionRequest, Lease, Payment, Vehicle } from "@/lib/types";
+import type { Booking, BookingExtra, Client, ExtensionRequest, Lease, Payment, Vehicle } from "@/lib/types";
 
 type VehicleBits = Pick<Vehicle, "name" | "make">;
 
@@ -129,6 +129,18 @@ async function sendPaymentInvoice(payment: PaymentRow) {
   if (!invoice?.email) return;
 
   const admin = createAdminClient();
+  if (payment.booking) {
+    // Separate query, errors ignored: an extras problem (or 0013 not run
+    // yet) must never stop the invoice going out.
+    const { data: extras } = await admin
+      .from("booking_extras")
+      .select("name, unit_price, quantity")
+      .eq("booking_id", payment.booking.id);
+    invoice.pickupExtras = ((extras ?? []) as Pick<BookingExtra, "name" | "unit_price" | "quantity">[]).map((e) => ({
+      description: `${e.quantity} x ${e.name}`,
+      amount: Number(e.unit_price) * e.quantity,
+    }));
+  }
   // Claim the send so the callback and a concurrent poll can't both email.
   const { data: claimed } = await admin
     .from("payments")
@@ -144,6 +156,11 @@ async function sendPaymentInvoice(payment: PaymentRow) {
     const firstName = invoice.billTo.name.split(" ")[0];
     const amount = formatKes(Number(payment.amount));
     const receipt = payment.mpesa_receipt ? ` (M-Pesa receipt ${payment.mpesa_receipt})` : "";
+    const extrasTotal = (invoice.pickupExtras ?? []).reduce((sum, e) => sum + e.amount, 0);
+    const extrasLine =
+      extrasTotal > 0
+        ? `Your extras (${invoice.pickupExtras!.map((e) => e.description).join(", ")}) will be ready with the car. Please pay ${formatKes(extrasTotal)} for them at pickup.`
+        : null;
     await sendEmail({
       to: invoice.email,
       subject: `Your ${BUSINESS.name} invoice ${invoice.invoiceNumber}`,
@@ -152,6 +169,7 @@ async function sendPaymentInvoice(payment: PaymentRow) {
         "",
         `Thank you — we've received your payment of ${amount}${receipt}.`,
         `Your invoice ${invoice.invoiceNumber} dated ${formatInvoiceDate(invoice.issuedAt)} is attached.`,
+        ...(extrasLine ? ["", extrasLine] : []),
         "",
         `Questions? Call ${BUSINESS.phone} or reply to this email.`,
         "",
@@ -161,6 +179,7 @@ async function sendPaymentInvoice(payment: PaymentRow) {
   <p>Hi ${escapeHtml(firstName)},</p>
   <p>Thank you — we've received your payment of <strong>${amount}</strong>${escapeHtml(receipt)}.</p>
   <p>Your invoice <strong>${invoice.invoiceNumber}</strong> dated ${formatInvoiceDate(invoice.issuedAt)} is attached.</p>
+  ${extrasLine ? `<p>${escapeHtml(extrasLine)}</p>` : ""}
   <p>Questions? Call ${escapeHtml(BUSINESS.phone)} or reply to this email.</p>
   <p style="color:#7d1c35;font-weight:bold">${escapeHtml(BUSINESS.name)}</p>
 </div>`,

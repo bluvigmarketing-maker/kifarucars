@@ -49,6 +49,10 @@ export function formatPriceText(vehicle: PriceFields): string | null {
 export const DISCOUNT_MIN_DAYS = 5;
 export const BOOKING_DISCOUNT = 1000;
 
+// Most of one extra (drinks etc.) a booking can include — matches the
+// booking_extras.quantity check in 0013_booking_extras.sql.
+export const MAX_EXTRA_QUANTITY = 50;
+
 export type BookingQuote = { days: number; subtotal: number; discount: number; total: number };
 
 // What a booking of `days` (inclusive) costs, in whole shillings — the

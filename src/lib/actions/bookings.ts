@@ -9,7 +9,7 @@ import { settleViaQueryIfStale, startStkPayment } from "@/lib/payments/stk";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createAdminClient, isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { BookingSchema, type BookingFormState } from "@/lib/validations";
+import { BookingExtrasField, BookingSchema, type BookingFormState } from "@/lib/validations";
 import { formatKes } from "@/lib/payments/balance";
 import { quoteBooking } from "@/lib/vehicle-display";
 import type { BookingStatus, PaymentStatus } from "@/lib/types";
@@ -39,6 +39,9 @@ export async function submitBooking(
   if (!validated.success) {
     return { status: "error", errors: validated.error.flatten().fieldErrors };
   }
+  // Extras (drinks etc.) are paid at pickup, so they never change the
+  // M-Pesa amount below — they're just recorded on the booking.
+  const extraPicks = BookingExtrasField.parse(formData.get("extras") ?? undefined);
 
   if (!isSupabaseConfigured) {
     return {
@@ -102,9 +105,38 @@ export async function submitBooking(
   };
 
   const admin = createAdminClient();
+
+  // Names and prices come from the menu, never the form; anything no
+  // longer offered is dropped.
+  let extraRows: { extra_id: string; name: string; unit_price: number; quantity: number }[] = [];
+  if (extraPicks.length > 0) {
+    const { data: menu } = await admin
+      .from("extras")
+      .select("id, name, price")
+      .eq("is_active", true)
+      .in("id", extraPicks.map((p) => p.id));
+    const byId = new Map((menu ?? []).map((e) => [e.id, e]));
+    extraRows = extraPicks.flatMap((pick) => {
+      const item = byId.get(pick.id);
+      return item ? [{ extra_id: item.id, name: item.name, unit_price: Number(item.price), quantity: pick.quantity }] : [];
+    });
+  }
+
   const { data: booking, error } = await admin.from("bookings").insert(record).select("id").single();
   if (error || !booking) {
     return { status: "error", message: "Something went wrong creating your booking. Please try again." };
+  }
+
+  if (extraRows.length > 0) {
+    const { error: extrasError } = await admin
+      .from("booking_extras")
+      .insert(extraRows.map((row) => ({ ...row, booking_id: booking.id })));
+    if (extrasError) {
+      // Nothing's been charged yet — undo rather than leave a booking
+      // whose extras the team doesn't know about.
+      await admin.from("bookings").delete().eq("id", booking.id);
+      return { status: "error", message: "Something went wrong saving your extras. Please try again." };
+    }
   }
   revalidatePath("/kifaruadmin/bookings");
 

@@ -28,6 +28,9 @@ export type InvoiceData = {
   paid: number;
   balance: number;
   mpesaReceipt: string | null;
+  // Booking extras (drinks etc.) — listed for reference, paid at pickup,
+  // so they're not part of total/paid/balance.
+  pickupExtras?: { description: string; amount: number }[];
 };
 
 // The built-in PDF fonts only cover WinAnsi; drop anything else (emoji,
@@ -144,6 +147,22 @@ export async function buildInvoicePdf(data: InvoiceData): Promise<Buffer> {
     if (!line) continue;
     page.drawText(safe(line), { x: left, y, size: 9.5, font: regular, color: INK });
     y -= 13;
+  }
+
+  // Extras paid at pickup.
+  if (data.pickupExtras?.length) {
+    y -= 16;
+    page.drawText("EXTRAS — PAY AT PICKUP", { x: left, y, size: 8.5, font: bold, color: MUTED });
+    y -= 15;
+    for (const extra of data.pickupExtras) {
+      page.drawText(safe(extra.description), { x: left, y, size: 9.5, font: regular, color: INK, maxWidth: 360 });
+      drawRight(page, formatKes(extra.amount), right - 10, y, 9.5, regular, INK);
+      y -= 13;
+    }
+    const extrasTotal = data.pickupExtras.reduce((sum, e) => sum + e.amount, 0);
+    page.drawText("Due at pickup", { x: right - 200, y: y - 2, size: 9.5, font: bold, color: BURGUNDY });
+    drawRight(page, formatKes(extrasTotal), right - 10, y - 2, 9.5, bold, BURGUNDY);
+    y -= 15;
   }
 
   // Footer.
