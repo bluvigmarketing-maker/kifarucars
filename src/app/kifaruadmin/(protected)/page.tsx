@@ -14,7 +14,7 @@ export default async function AdminOverviewPage() {
       Icon: Car,
     },
     {
-      label: "Pending applications",
+      label: "Pending lease applications",
       value: stats.pendingApplicationCount,
       hint: `${stats.totalApplicationCount} total`,
       href: "/kifaruadmin/applications",

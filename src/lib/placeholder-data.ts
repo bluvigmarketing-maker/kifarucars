@@ -15,6 +15,7 @@ export const BUSINESS = {
   googleReviewCount: 120, // PLACEHOLDER
   phone: "+254 721 478 316",
   whatsapp: "254721478316", // no leading +, for wa.me links
+  // Call-to-action number (Nick, sales) — used on the public "call us" buttons.
   salesPhone: "+254 790 520 765",
   email: "info@kifaru.ke",
   locations: ["Nairobi", "Kisumu", "Mombasa", "Nanyuki", "Nakuru"],
@@ -91,7 +92,13 @@ function rateCardVehicle(
 }
 
 export const PLACEHOLDER_VEHICLES: Vehicle[] = [
-  rateCardVehicle("ph-1", "Lexus", "LX 570", "", 22500, "lexus-lx-570", "cat-luxury", 1),
+  {
+    ...rateCardVehicle("ph-1", "Lexus", "LX 570", "Petrol", 22500, "lexus-lx-570", "cat-luxury", 1),
+    year: 2021,
+    seats: 8,
+    engine_capacity: "5.7L V8",
+    additional_features: ["Full-time 4WD", "Leather seats", "Third-row seating"],
+  },
   rateCardVehicle("ph-2", "Toyota", "Prado VXL (Diesel)", "Diesel", 15000, "toyota-prado-vxl-diesel", "cat-prado", 2),
   rateCardVehicle("ph-3", "Toyota", "Prado VXL (Petrol)", "Petrol", 14000, "toyota-prado-vxl-petrol", "cat-prado", 3),
   rateCardVehicle("ph-4", "Toyota", "Land Cruiser Prado TX", "", 13000, "toyota-prado-tx", "cat-prado", 4),

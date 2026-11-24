@@ -188,6 +188,9 @@ export type Booking = {
   discount: number;
   estimated_total: number | null;
   notes: string | null;
+  // Said "yes" to extras at checkout and was sent to the Kifaru Liquor site
+  // (migration 0015). Undefined on databases that haven't run it yet.
+  wants_liquor?: boolean;
   status: BookingStatus;
   created_at: string;
 };

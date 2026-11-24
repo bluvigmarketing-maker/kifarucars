@@ -7,7 +7,7 @@ export default async function AdminApplicationsPage() {
   return (
     <div>
       <h1 className="font-display text-2xl text-charcoal-950 dark:text-white">
-        Vehicle Applications
+        Lease Applications
       </h1>
       <p className="mt-1 text-sm text-charcoal-500 dark:text-charcoal-400">
         {applications.length} total &middot; car owners applying to lease their vehicle through the fleet

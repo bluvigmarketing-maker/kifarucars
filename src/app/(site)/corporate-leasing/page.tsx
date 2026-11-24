@@ -65,7 +65,7 @@ export default function CorporateLeasingPage() {
           <div id="quote" className="scroll-mt-24">
             <h2 className="font-display text-2xl text-charcoal-950 dark:text-white">Request A Leasing Quote</h2>
             <p className="mt-1 mb-6 text-sm text-charcoal-500 dark:text-charcoal-400">
-              Prefer to talk? Call {BUSINESS.phone}.
+              Prefer to talk? Call {BUSINESS.salesPhone}.
             </p>
             <CorporateQuoteForm />
           </div>

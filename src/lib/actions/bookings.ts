@@ -102,6 +102,9 @@ export async function submitBooking(
     discount: quote.discount,
     estimated_total: quote.total,
     notes: notes || null,
+    // Only sent when true, so bookings keep working on a database that
+    // hasn't run migration 0015 yet as long as nobody picks the liquor add-on.
+    ...(formData.get("wantsLiquor") === "yes" ? { wants_liquor: true } : {}),
   };
 
   const admin = createAdminClient();
