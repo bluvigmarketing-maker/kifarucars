@@ -375,8 +375,8 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
                     <ExtrasPicker extras={extras} quantities={extraQuantities} onChange={setExtraQuantities} />
                     {liquorLink ? (
                       <p className="text-xs text-charcoal-500 dark:text-charcoal-400">
-                        After you pay for the car, we&apos;ll link you to the Kifaru Liquor shop to choose your
-                        drinks — that order is joined to this booking.
+                        Choose your drinks from the Kifaru Liquor shop — your drinks order is combined with this
+                        car booking.
                       </p>
                     ) : null}
                   </div>
