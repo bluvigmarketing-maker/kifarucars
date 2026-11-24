@@ -188,8 +188,7 @@ export type Booking = {
   discount: number;
   estimated_total: number | null;
   notes: string | null;
-  // Said "yes" to extras at checkout and was sent to the Kifaru Liquor site
-  // (migration 0015). Undefined on databases that haven't run it yet.
+  // Kifaru Liquor drinks were added to this booking (migration 0015).
   wants_liquor?: boolean;
   status: BookingStatus;
   created_at: string;
@@ -199,6 +198,8 @@ export type BookingWithVehicle = Booking & {
   vehicle: Pick<Vehicle, "id" | "name" | "make" | "year">;
   payments: Pick<Payment, "amount" | "status" | "mpesa_receipt">[];
   extras: Pick<BookingExtra, "name" | "unit_price" | "quantity">[];
+  // Kifaru Liquor drinks paid together with the car (liquor_orders).
+  drinks: { name: string; unit_price: number; quantity: number }[];
 };
 
 // An item on the extras menu (/kifaruadmin/extras) — drinks, snacks,

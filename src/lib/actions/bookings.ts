@@ -11,6 +11,7 @@ import { createAdminClient, isServiceRoleConfigured } from "@/lib/supabase/admin
 import { createClient } from "@/lib/supabase/server";
 import { BookingExtrasField, BookingSchema, type BookingFormState } from "@/lib/validations";
 import { formatKes } from "@/lib/payments/balance";
+import { parseLiquorPicks, pendingDrinksTotal, priceLiquorPicks } from "@/lib/liquor";
 import { quoteBooking } from "@/lib/vehicle-display";
 import type { BookingStatus, PaymentStatus } from "@/lib/types";
 
@@ -42,6 +43,8 @@ export async function submitBooking(
   // Extras (drinks etc.) are paid at pickup, so they never change the
   // M-Pesa amount below — they're just recorded on the booking.
   const extraPicks = BookingExtrasField.parse(formData.get("extras") ?? undefined);
+  // Kifaru Liquor drinks, by contrast, ARE paid now: same M-Pesa prompt as the car.
+  const drinkPicks = parseLiquorPicks(formData.get("drinks"));
 
   if (!isSupabaseConfigured) {
     return {
@@ -79,7 +82,15 @@ export async function submitBooking(
   if (!quote) {
     return { status: "error", message: "This car can't be booked online. Please call us to book it." };
   }
-  if (quote.total > MAX_STK_AMOUNT) {
+  const drinks = await priceLiquorPicks(drinkPicks);
+  if (drinkPicks.length > 0 && drinks.lines.length < drinkPicks.length) {
+    return {
+      status: "error",
+      message: "Some of the drinks you picked are no longer available. Please check your drinks and try again.",
+    };
+  }
+  const amount = quote.total + drinks.total;
+  if (amount > MAX_STK_AMOUNT) {
     return {
       status: "error",
       message: `M-Pesa allows up to ${formatKes(MAX_STK_AMOUNT)} per payment — please call us to book these dates.`,
@@ -102,9 +113,7 @@ export async function submitBooking(
     discount: quote.discount,
     estimated_total: quote.total,
     notes: notes || null,
-    // Only sent when true, so bookings keep working on a database that
-    // hasn't run migration 0015 yet as long as nobody picks the liquor add-on.
-    ...(formData.get("wantsLiquor") === "yes" ? { wants_liquor: true } : {}),
+    ...(drinks.lines.length > 0 ? { wants_liquor: true } : {}),
   };
 
   const admin = createAdminClient();
@@ -141,16 +150,47 @@ export async function submitBooking(
       return { status: "error", message: "Something went wrong saving your extras. Please try again." };
     }
   }
+
+  if (drinks.lines.length > 0) {
+    // The drinks become a Kifaru Liquor order linked to this booking. It's
+    // paid by the booking's M-Pesa payment and marked paid in onPaymentPaid.
+    const { data: order, error: orderError } = await admin
+      .from("liquor_orders")
+      .insert({
+        source: "car_hire",
+        booking_id: booking.id,
+        full_name: fullName,
+        phone,
+        email,
+        notes: "Drinks to be ready with the hire car.",
+        subtotal: drinks.total,
+      })
+      .select("id")
+      .single();
+    const { error: itemsError } = order
+      ? await admin.from("liquor_order_items").insert(drinks.lines.map((line) => ({ ...line, order_id: order.id })))
+      : { error: orderError };
+    if (orderError || itemsError) {
+      // Nothing charged yet — undo so the drinks aren't silently dropped.
+      await admin.from("bookings").delete().eq("id", booking.id);
+      return { status: "error", message: "Something went wrong saving your drinks. Please try again." };
+    }
+  }
   revalidatePath("/kifaruadmin/bookings");
 
   const result = await startStkPayment(
     { bookingId: booking.id },
-    { amount: quote.total, phone, accountReference: "KifaruBooking", description: "Car hire booking" }
+    {
+      amount,
+      phone,
+      accountReference: "KifaruBooking",
+      description: drinks.lines.length > 0 ? "Car and drinks" : "Car hire booking",
+    }
   );
   if (!result.ok) {
     return { status: "error", message: result.message, bookingId: booking.id };
   }
-  return { status: "sent", bookingId: booking.id, paymentId: result.paymentId, amount: quote.total };
+  return { status: "sent", bookingId: booking.id, paymentId: result.paymentId, amount };
 }
 
 // Re-sends the M-Pesa prompt for an unpaid booking (cancelled on the phone,
@@ -173,10 +213,17 @@ export async function retryBookingPayment(bookingId: string): Promise<BookingFor
     return { status: "error", message: "This booking is already paid." };
   }
 
-  const amount = Number(booking.estimated_total);
+  // The car plus any Kifaru Liquor drinks picked with it.
+  const drinksTotal = await pendingDrinksTotal(admin, bookingId);
+  const amount = Number(booking.estimated_total) + drinksTotal;
   const result = await startStkPayment(
     { bookingId },
-    { amount, phone: booking.phone, accountReference: "KifaruBooking", description: "Car hire booking" }
+    {
+      amount,
+      phone: booking.phone,
+      accountReference: "KifaruBooking",
+      description: drinksTotal > 0 ? "Car and drinks" : "Car hire booking",
+    }
   );
   if (!result.ok) return { status: "error", message: result.message, bookingId };
   return { status: "sent", bookingId, paymentId: result.paymentId, amount };

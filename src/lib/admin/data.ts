@@ -108,6 +108,9 @@ export async function listAllPayments(): Promise<PaymentWithLease[]> {
   const { data } = await supabase
     .from("payments")
     .select(`*, lease:leases(${LEASE_RELATIONS_SELECT}), booking:bookings(*, vehicle:vehicles(id, name, make, year))`)
+    // The payments table is shared with Kifaru Liquor; its own shop orders
+    // are managed in the liquor admin, so only show car-hire payments here.
+    .or("lease_id.not.is.null,booking_id.not.is.null")
     .order("created_at", { ascending: false });
   return (data ?? []) as unknown as PaymentWithLease[];
 }
@@ -147,7 +150,7 @@ export async function listAllBookings(): Promise<BookingWithVehicle[]> {
     .from("bookings")
     .select("*, vehicle:vehicles(id, name, make, year), payments(amount, status, mpesa_receipt)")
     .order("created_at", { ascending: false });
-  const bookings = (data ?? []) as Omit<BookingWithVehicle, "extras">[];
+  const bookings = (data ?? []) as Omit<BookingWithVehicle, "extras" | "drinks">[];
   if (bookings.length === 0) return [];
 
   // Extras fetched separately so the bookings list still loads if this
@@ -162,7 +165,24 @@ export async function listAllBookings(): Promise<BookingWithVehicle[]> {
     list.push({ name: extra.name, unit_price: Number(extra.unit_price), quantity: extra.quantity });
     byBooking.set(extra.booking_id, list);
   }
-  return bookings.map((b) => ({ ...b, extras: byBooking.get(b.id) ?? [] }));
+  // Kifaru Liquor drinks paid with each booking (empty if the liquor
+  // migrations haven't been run).
+  const { data: drinkOrders } = await supabase
+    .from("liquor_orders")
+    .select("booking_id, status, items:liquor_order_items(name, unit_price, quantity)")
+    .in("booking_id", bookings.map((b) => b.id))
+    .neq("status", "cancelled");
+  const drinksByBooking = new Map<string, BookingWithVehicle["drinks"]>();
+  for (const order of (drinkOrders ?? []) as {
+    booking_id: string;
+    items: { name: string; unit_price: number; quantity: number }[];
+  }[]) {
+    const list = drinksByBooking.get(order.booking_id) ?? [];
+    for (const item of order.items) list.push({ ...item, unit_price: Number(item.unit_price) });
+    drinksByBooking.set(order.booking_id, list);
+  }
+
+  return bookings.map((b) => ({ ...b, extras: byBooking.get(b.id) ?? [], drinks: drinksByBooking.get(b.id) ?? [] }));
 }
 
 export async function getDashboardStats() {
