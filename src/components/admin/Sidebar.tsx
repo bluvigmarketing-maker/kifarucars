@@ -26,7 +26,7 @@ export const NAV_ITEMS = [
   { label: "Categories", href: "/kifaruadmin/categories", Icon: Tags },
   { label: "Bookings", href: "/kifaruadmin/bookings", Icon: CalendarCheck },
   { label: "Extras", href: "/kifaruadmin/extras", Icon: CupSoda },
-  { label: "Applications", href: "/kifaruadmin/applications", Icon: ClipboardList },
+  { label: "Lease Applications", href: "/kifaruadmin/applications", Icon: ClipboardList },
   { label: "Lease records", href: "/kifaruadmin/leases", Icon: FileClock },
   { label: "Extensions", href: "/kifaruadmin/extension-requests", Icon: Hourglass },
   { label: "Payments", href: "/kifaruadmin/payments", Icon: Wallet },

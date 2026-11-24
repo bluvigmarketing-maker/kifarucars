@@ -137,6 +137,14 @@ export function BookingsTable({ bookings, emptyMessage }: { bookings: BookingWit
               </div>
             ) : null}
 
+            {booking.wants_liquor ? (
+              <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-charcoal-950 dark:text-white">
+                <ShoppingBag size={15} className="text-gold-600 dark:text-gold-400" />
+                Wants Kifaru Liquor delivered with the car — check the liquor site for an order under this
+                booking.
+              </p>
+            ) : null}
+
             {booking.notes ? (
               <p className="mt-3 text-sm text-charcoal-700 dark:text-charcoal-300">{booking.notes}</p>
             ) : null}

@@ -28,7 +28,7 @@ export function FleetSection({
 }) {
   const [soundPreference, setSoundEnabled] = useState(true);
   const soundEnabled = ENGINE_SOUND_ENABLED && soundPreference;
-  const [view, setView] = useState<ViewMode>("slider");
+  const [view, setView] = useState<ViewMode>("grid");
   const [activeSlide, setActiveSlide] = useState(0);
   const [page, setPage] = useState(0);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);

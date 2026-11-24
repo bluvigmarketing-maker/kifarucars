@@ -40,8 +40,8 @@ export function WhyChooseUs() {
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <Button href="#enquiry">Make An Enquiry</Button>
-              <a href={`tel:${BUSINESS.phone}`} className="text-sm font-medium text-charcoal-700 hover:text-burgundy-700 dark:text-charcoal-300 dark:hover:text-burgundy-400">
-                {BUSINESS.phone}
+              <a href={`tel:${BUSINESS.salesPhone.replace(/\s/g, "")}`} className="text-sm font-medium text-charcoal-700 hover:text-burgundy-700 dark:text-charcoal-300 dark:hover:text-burgundy-400">
+                {BUSINESS.salesPhone}
               </a>
             </div>
           </div>

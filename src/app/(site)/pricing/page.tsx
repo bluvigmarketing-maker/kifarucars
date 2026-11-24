@@ -138,7 +138,7 @@ export default async function PricingPage() {
 
           {groups.length === 0 ? (
             <p className="text-charcoal-500 dark:text-charcoal-400">
-              Rates are being updated — call us on {BUSINESS.phone} for a quote.
+              Rates are being updated — call us on {BUSINESS.salesPhone} for a quote.
             </p>
           ) : null}
         </div>
