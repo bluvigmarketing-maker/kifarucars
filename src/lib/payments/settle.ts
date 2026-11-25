@@ -2,7 +2,7 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { daysInclusive, formatDisplayDate } from "@/lib/booking-dates";
-import { isEmailConfigured, sendEmail } from "@/lib/email/mailer";
+import { isEmailReady, sendEmail } from "@/lib/email/mailer";
 import { buildInvoicePdf, formatInvoiceDate, type InvoiceData, type InvoiceLine } from "@/lib/invoices/pdf";
 import { formatKes } from "@/lib/payments/balance";
 import { BUSINESS } from "@/lib/placeholder-data";
@@ -141,7 +141,7 @@ function invoiceFor(payment: PaymentRow, drinks: DrinkLine[] = []): (InvoiceData
 }
 
 async function sendPaymentInvoice(payment: PaymentRow) {
-  if (!isEmailConfigured || payment.invoice_sent_at) return;
+  if (payment.invoice_sent_at || !(await isEmailReady())) return;
   const admin = createAdminClient();
 
   let drinks: DrinkLine[] = [];
@@ -212,8 +212,11 @@ async function sendPaymentInvoice(payment: PaymentRow) {
   <p>Questions? Call ${escapeHtml(BUSINESS.phone)} or reply to this email.</p>
   <p style="color:#7d1c35;font-weight:bold">${escapeHtml(BUSINESS.name)}</p>
 </div>`,
-      attachments: [{ filename: `${invoice.invoiceNumber}.pdf`, content: pdf, contentType: "application/pdf" }],
-    });
+        attachments: [{ filename: `${invoice.invoiceNumber}.pdf`, content: pdf, contentType: "application/pdf" }],
+      },
+      // Staff inbox from the email settings gets a copy of every invoice.
+      { copyStaff: true }
+    );
   } catch (error) {
     console.error("Invoice email failed", payment.id, error instanceof Error ? error.message : error);
     // Release the claim so a later callback retry or poll can try again.

@@ -11,6 +11,7 @@ import {
   Hourglass,
   LayoutDashboard,
   LogOut,
+  Mail,
   MessageSquare,
   Star,
   Tags,
@@ -32,6 +33,7 @@ export const NAV_ITEMS = [
   { label: "Payments", href: "/kifaruadmin/payments", Icon: Wallet },
   { label: "Enquiries", href: "/kifaruadmin/enquiries", Icon: MessageSquare },
   { label: "Reviews", href: "/kifaruadmin/reviews", Icon: Star },
+  { label: "Email settings", href: "/kifaruadmin/settings", Icon: Mail },
 ];
 
 export function Sidebar({ adminLabel }: { adminLabel: string }) {
