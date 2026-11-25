@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Car, ClipboardList, FileClock, Hourglass, MessageSquare, Star } from "lucide-react";
+import { Car, ClipboardList, FileClock, Hourglass, MessageSquare, ShoppingBag, Star } from "lucide-react";
 import { getDashboardStats } from "@/lib/admin/data";
+import { countOpenLiquorOrders } from "@/lib/admin/liquor-data";
 
 export default async function AdminOverviewPage() {
-  const stats = await getDashboardStats();
+  const [stats, liquor] = await Promise.all([getDashboardStats(), countOpenLiquorOrders()]);
 
   const cards = [
     {
@@ -42,6 +43,13 @@ export default async function AdminOverviewPage() {
       Icon: MessageSquare,
     },
     {
+      label: "Liquor orders to fulfil",
+      value: liquor.open,
+      hint: `${liquor.total} paid orders total`,
+      href: "/kifaruadmin/liquor/orders",
+      Icon: ShoppingBag,
+    },
+    {
       label: "Reviews",
       value: stats.reviewCount,
       hint: "shown on homepage",
@@ -54,7 +62,7 @@ export default async function AdminOverviewPage() {
     <div>
       <h1 className="font-display text-2xl text-charcoal-950 dark:text-white">Overview</h1>
       <p className="mt-1 text-sm text-charcoal-500 dark:text-charcoal-400">
-        Manage your Prado fleet, car-owner applications, enquiries and reviews shown on kifarucarhire.com.
+        Manage Kifaru Car Hire (fleet, bookings, leases, enquiries) and the Kifaru Liquor shop.
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

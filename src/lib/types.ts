@@ -285,3 +285,54 @@ export type ClientPortalView = {
   extensionCharges: number;
   amountPaid: number;
 };
+
+// ── Kifaru Liquor (liquor_* tables, shared Supabase project) ─────────────
+
+export type LiquorCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  parent_id: string | null;
+  description: string;
+  sort_order: number;
+};
+
+export type LiquorProduct = {
+  id: string;
+  slug: string;
+  name: string;
+  sku: string;
+  short_description: string;
+  description: string;
+  price: number;
+  regular_price: number | null;
+  image_url: string | null;
+  in_stock: boolean;
+  is_active: boolean;
+  is_featured: boolean;
+  sort_order: number;
+  updated_at: string;
+  category_ids: string[];
+};
+
+export type LiquorOrderStatus = "pending_payment" | "paid" | "processing" | "delivered" | "cancelled";
+
+export type LiquorOrder = {
+  id: string;
+  order_number: number;
+  source: "liquor" | "car_hire";
+  booking_id: string | null;
+  full_name: string;
+  phone: string;
+  email: string | null;
+  delivery_address: string | null;
+  notes: string | null;
+  subtotal: number;
+  status: LiquorOrderStatus;
+  paid_at: string | null;
+  created_at: string;
+  items: { name: string; unit_price: number; quantity: number }[];
+  mpesa_receipt: string | null;
+  // Car-hire orders: the hire dates, so staff know when the drinks are due.
+  booking: { start_date: string; end_date: string; vehicle_name: string } | null;
+};
