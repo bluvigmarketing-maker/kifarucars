@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { CalendarDays, ShoppingBag, Trash2 } from "lucide-react";
+import { CalendarDays, ShoppingBag, Trash2, Wine } from "lucide-react";
 import { deleteBooking, updateBookingStatus } from "@/lib/actions/bookings";
 import { daysInclusive, formatDisplayDate } from "@/lib/booking-dates";
 import { cn } from "@/lib/cn";
@@ -137,12 +137,24 @@ export function BookingsTable({ bookings, emptyMessage }: { bookings: BookingWit
               </div>
             ) : null}
 
-            {booking.wants_liquor ? (
-              <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-charcoal-950 dark:text-white">
-                <ShoppingBag size={15} className="text-gold-600 dark:text-gold-400" />
-                Wants Kifaru Liquor delivered with the car — check the liquor site for an order under this
-                booking.
-              </p>
+            {booking.drinks.length > 0 ? (
+              <div className="mt-3 rounded-lg border border-burgundy-200 bg-burgundy-50/40 px-4 py-3 text-sm dark:border-burgundy-900 dark:bg-burgundy-950/20">
+                <p className="flex items-center gap-1.5 font-medium text-charcoal-950 dark:text-white">
+                  <Wine size={15} className="text-burgundy-600 dark:text-burgundy-400" />
+                  Kifaru Liquor drinks to have ready with the car — paid with this booking (
+                  {formatKes(booking.drinks.reduce((sum, d) => sum + d.unit_price * d.quantity, 0))})
+                </p>
+                <ul className="mt-1.5 space-y-0.5 text-charcoal-700 dark:text-charcoal-300">
+                  {booking.drinks.map((drink, i) => (
+                    <li key={i} className="flex justify-between gap-4">
+                      <span>
+                        {drink.quantity} × {drink.name}
+                      </span>
+                      <span className="tabular-nums">{formatKes(drink.unit_price * drink.quantity)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ) : null}
 
             {booking.notes ? (

@@ -45,6 +45,12 @@ export async function onPaymentPaid(paymentId: string) {
 
   if (payment.booking) {
     await admin.from("bookings").update({ status: "confirmed" }).eq("id", payment.booking.id).eq("status", "pending");
+    // Kifaru Liquor drinks picked with the car were part of this payment.
+    await admin
+      .from("liquor_orders")
+      .update({ status: "paid", paid_at: payment.paid_at ?? new Date().toISOString() })
+      .eq("booking_id", payment.booking.id)
+      .eq("status", "pending_payment");
     try {
       revalidatePath(`/fleet/${payment.booking.vehicle_id}`);
       revalidatePath("/kifaruadmin/bookings");
@@ -62,7 +68,9 @@ export function invoiceNumber(payment: Pick<Payment, "id" | "paid_at" | "created
   return `KIF-${ymd}-${payment.id.slice(0, 6).toUpperCase()}`;
 }
 
-function invoiceFor(payment: PaymentRow): (InvoiceData & { email: string | null }) | null {
+type DrinkLine = { name: string; unit_price: number; quantity: number };
+
+function invoiceFor(payment: PaymentRow, drinks: DrinkLine[] = []): (InvoiceData & { email: string | null }) | null {
   const base = {
     invoiceNumber: invoiceNumber(payment),
     issuedAt: new Date(payment.paid_at ?? payment.created_at),
@@ -72,16 +80,25 @@ function invoiceFor(payment: PaymentRow): (InvoiceData & { email: string | null 
   if (payment.booking) {
     const b = payment.booking;
     const days = daysInclusive(b.start_date, b.end_date);
-    const total = Number(b.estimated_total ?? payment.amount);
+    const carTotal = Number(b.estimated_total ?? payment.amount);
     const discount = Number(b.discount ?? 0);
     const lines: InvoiceLine[] = [
       {
         description: `${vehicleTitle(b.vehicle)} hire`,
         detail: `${formatDisplayDate(b.start_date)} to ${formatDisplayDate(b.end_date)} · ${days} day${days === 1 ? "" : "s"}`,
-        amount: Number(b.subtotal ?? total + discount),
+        amount: Number(b.subtotal ?? carTotal + discount),
       },
     ];
     if (discount > 0) lines.push({ description: `Discount — ${DISCOUNT_MIN_DAYS}+ day booking`, amount: -discount });
+    // Kifaru Liquor drinks paid in the same M-Pesa payment.
+    for (const d of drinks) {
+      lines.push({
+        description: `Kifaru Liquor — ${d.name}`,
+        detail: `${d.quantity} x ${formatKes(Number(d.unit_price))}`,
+        amount: Number(d.unit_price) * d.quantity,
+      });
+    }
+    const total = carTotal + drinks.reduce((sum, d) => sum + Number(d.unit_price) * d.quantity, 0);
     const paid = sumPaid(b.payments);
     return {
       ...base,
@@ -125,10 +142,22 @@ function invoiceFor(payment: PaymentRow): (InvoiceData & { email: string | null 
 
 async function sendPaymentInvoice(payment: PaymentRow) {
   if (!isEmailConfigured || payment.invoice_sent_at) return;
-  const invoice = invoiceFor(payment);
+  const admin = createAdminClient();
+
+  let drinks: DrinkLine[] = [];
+  if (payment.booking) {
+    // Errors ignored: a liquor-table problem must never stop the invoice.
+    const { data } = await admin
+      .from("liquor_orders")
+      .select("items:liquor_order_items(name, unit_price, quantity)")
+      .eq("booking_id", payment.booking.id)
+      .neq("status", "cancelled");
+    drinks = ((data ?? []) as { items: DrinkLine[] }[]).flatMap((o) => o.items);
+  }
+
+  const invoice = invoiceFor(payment, drinks);
   if (!invoice?.email) return;
 
-  const admin = createAdminClient();
   if (payment.booking) {
     // Separate query, errors ignored: an extras problem (or 0013 not run
     // yet) must never stop the invoice going out.

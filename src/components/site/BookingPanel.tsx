@@ -1,14 +1,14 @@
 "use client";
 
 import { useActionState, useEffect, useState, useTransition } from "react";
-import { CheckCircle2, ExternalLink, Loader2, Phone, ShoppingBag, Smartphone, Tag, X } from "lucide-react";
+import { CheckCircle2, Loader2, Phone, ShoppingBag, Smartphone, Tag, Wine, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BookingCalendar, type DateRange } from "@/components/site/BookingCalendar";
 import { ExtrasPicker, selectedExtras, type ExtraQuantities } from "@/components/site/ExtrasPicker";
+import { drinksTotal, LiquorPicker, type DrinkPicks } from "@/components/site/LiquorPicker";
 import { getBookingPaymentStatus, retryBookingPayment, submitBooking } from "@/lib/actions/bookings";
 import { daysInclusive, formatDisplayDate } from "@/lib/booking-dates";
 import { cn } from "@/lib/cn";
-import { liquorSiteLink } from "@/lib/features";
 import { formatKes } from "@/lib/payments/balance";
 import { BUSINESS } from "@/lib/placeholder-data";
 import {
@@ -74,13 +74,14 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   const [email, setEmail] = useState("");
   const [extraQuantities, setExtraQuantities] = useState<ExtraQuantities>({});
-  // "Would you like extra options?" — Yes opens the extras menu and the
-  // Kifaru Liquor link; No hides both.
+  // "Would you like extra options?" — Yes opens the Kifaru Liquor catalogue
+  // (paid now, together with the car) and any pickup extras; No hides both.
   const [wantsExtras, setWantsExtras] = useState<"yes" | "no" | null>(null);
-  const liquorLink = liquorSiteLink();
-  const offersExtras = extras.length > 0 || liquorLink !== null;
+  const [drinkPicks, setDrinkPicks] = useState<DrinkPicks>({});
   const pickedExtras = selectedExtras(extras, wantsExtras === "yes" ? extraQuantities : {});
-  const wantsLiquor = wantsExtras === "yes" && liquorLink !== null;
+  const drinks = wantsExtras === "yes" ? drinkPicks : {};
+  const drinkLines = Object.entries(drinks);
+  const drinksSum = drinksTotal(drinks);
   const [outcome, setOutcome] = useState<{ paymentId: string; status: PaymentStatus | "timeout" } | null>(null);
 
   // The latest attempt wins: a retry's result replaces the original submit's.
@@ -94,6 +95,8 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
   const price = formatPrice(vehicle);
   const days = range.start && range.end ? daysInclusive(range.start, range.end) : 0;
   const quote = days ? quoteBooking(vehicle, days) : null;
+  // One M-Pesa payment covers the car and any Kifaru Liquor drinks.
+  const amountDue = quote ? quote.total + drinksSum : null;
   // To book, the customer has to pay — so only per-day/per-month priced
   // cars can be booked here, and only while M-Pesa is set up.
   const bookable = onlinePayment && quoteBooking(vehicle, 1) !== null;
@@ -147,16 +150,11 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
               with the car — please pay {formatKes(pickedExtras.total)} for them at pickup.
             </p>
           ) : null}
-          {wantsLiquor && bookingId ? (
-            <div className="mt-4">
-              <p className="text-sm text-charcoal-600 dark:text-charcoal-300">
-                Now pick your drinks from Kifaru Liquor — your order is linked to this booking and delivered with
-                the car.
-              </p>
-              <Button href={liquorSiteLink(bookingId)!} size="md" className="mt-2" target="_blank" rel="noopener">
-                <ShoppingBag size={16} /> Shop Kifaru Liquor <ExternalLink size={14} />
-              </Button>
-            </div>
+          {drinkLines.length > 0 ? (
+            <p className="mt-2 text-sm text-charcoal-600 dark:text-charcoal-300">
+              Your Kifaru Liquor drinks ({drinkLines.map(([, d]) => `${d.quantity}× ${d.name}`).join(", ")}) are paid
+              for and will be ready with the car.
+            </p>
           ) : null}
         </div>
       </div>
@@ -174,8 +172,11 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
       <div className="rounded-xl bg-charcoal-50 px-4 py-3 text-sm dark:bg-charcoal-800">
         <p className="font-medium text-charcoal-950 dark:text-white">{vehicleTitle(vehicle)}</p>
         {dates ? <p className="text-charcoal-600 dark:text-charcoal-300">{dates}</p> : null}
-        {quote ? (
-          <p className="mt-1 font-semibold text-charcoal-950 dark:text-white">{formatKes(quote.total)}</p>
+        {drinkLines.length > 0 ? (
+          <p className="text-charcoal-600 dark:text-charcoal-300">+ Kifaru Liquor drinks {formatKes(drinksSum)}</p>
+        ) : null}
+        {amountDue !== null ? (
+          <p className="mt-1 font-semibold text-charcoal-950 dark:text-white">{formatKes(amountDue)}</p>
         ) : null}
         {pickedExtras.total > 0 ? (
           <p className="mt-1 text-xs text-charcoal-500 dark:text-charcoal-400">
@@ -275,6 +276,11 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
               name="extras"
               value={JSON.stringify(pickedExtras.lines.map((l) => ({ id: l.id, quantity: l.quantity })))}
             />
+            <input
+              type="hidden"
+              name="drinks"
+              value={JSON.stringify(drinkLines.map(([id, d]) => ({ id, quantity: d.quantity })))}
+            />
 
             {price ? (
               <p className="text-charcoal-600 dark:text-charcoal-300">
@@ -328,9 +334,17 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
                       <dd>&minus; {formatKes(quote.discount)}</dd>
                     </div>
                   ) : null}
+                  {drinksSum > 0 ? (
+                    <div className="flex justify-between text-charcoal-600 dark:text-charcoal-300">
+                      <dt className="flex items-center gap-1.5">
+                        <Wine size={13} /> Kifaru Liquor drinks
+                      </dt>
+                      <dd>{formatKes(drinksSum)}</dd>
+                    </div>
+                  ) : null}
                   <div className="flex justify-between border-t border-charcoal-200 pt-1.5 font-semibold text-charcoal-950 dark:border-charcoal-700 dark:text-white">
                     <dt>Total</dt>
-                    <dd>{formatKes(quote.total)}</dd>
+                    <dd>{formatKes(amountDue ?? quote.total)}</dd>
                   </div>
                 </dl>
               ) : null}
@@ -342,15 +356,13 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
               ) : null}
             </div>
 
-            <input type="hidden" name="wantsLiquor" value={wantsLiquor ? "yes" : "no"} />
-            {offersExtras ? (
-              <fieldset>
+            <fieldset>
                 <legend className="flex items-center gap-1.5 text-sm font-medium text-charcoal-700 dark:text-charcoal-300">
                   <ShoppingBag size={15} className="text-gold-600 dark:text-gold-400" />
                   Would you like extra options with your car?
                 </legend>
                 <p className="mt-0.5 text-xs text-charcoal-500 dark:text-charcoal-400">
-                  Drinks and more from Kifaru Liquor, ready with your car.
+                  Drinks from Kifaru Liquor, paid together with your car and ready when you pick it up.
                 </p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {(["yes", "no"] as const).map((answer) => (
@@ -372,17 +384,11 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
                 </div>
                 {wantsExtras === "yes" ? (
                   <div className="mt-3 space-y-3">
+                    <LiquorPicker picks={drinkPicks} onChange={setDrinkPicks} />
                     <ExtrasPicker extras={extras} quantities={extraQuantities} onChange={setExtraQuantities} />
-                    {liquorLink ? (
-                      <p className="text-xs text-charcoal-500 dark:text-charcoal-400">
-                        After you pay for the car, we&apos;ll link you to the Kifaru Liquor shop to choose your
-                        drinks — that order is joined to this booking.
-                      </p>
-                    ) : null}
                   </div>
                 ) : null}
-              </fieldset>
-            ) : null}
+            </fieldset>
 
             <div className="space-y-4">
               <div>
@@ -436,8 +442,8 @@ function BookingFlow({ vehicle, unavailable, onlinePayment, extras, onStartOver 
               <Smartphone size={18} />
               {submitting
                 ? "Sending M-Pesa prompt..."
-                : quote
-                  ? `Pay ${formatKes(quote.total)} to Book`
+                : amountDue !== null
+                  ? `Pay ${formatKes(amountDue)} to Book`
                   : "Pay with M-Pesa to Book"}
             </Button>
             <p className="-mt-2 text-center text-xs text-charcoal-500 dark:text-charcoal-400">
