@@ -13,10 +13,10 @@ export const BUSINESS = {
   driverCount: "15", // PLACEHOLDER
   googleRating: 4.8, // PLACEHOLDER
   googleReviewCount: 120, // PLACEHOLDER
-  phone: "+254 721 478 316",
+  phone: "+254 721 478316",
   whatsapp: "254721478316", // no leading +, for wa.me links
   // Call-to-action number (Nick, sales) — used on the public "call us" buttons.
-  salesPhone: "+254 790 520 765",
+  salesPhone: "+254 721 478316",
   email: "info@kifaru.ke",
   locations: ["Nairobi", "Kisumu", "Mombasa", "Nanyuki", "Nakuru"],
 };
