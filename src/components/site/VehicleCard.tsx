@@ -7,6 +7,7 @@ import { Cog, Fuel, Settings2, Users, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useEngineSound } from "@/hooks/useEngineSound";
 import { VEHICLE_VIDEO_ENABLED } from "@/lib/features";
+import { isNewArrival } from "@/lib/promo";
 import type { PublicVehicle } from "@/lib/types";
 import { vehicleSubtitle, vehicleTitle } from "@/lib/vehicle-display";
 
@@ -70,6 +71,15 @@ export function VehicleCard({
             preload="metadata"
             className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           />
+        ) : null}
+        {isNewArrival(vehicle.id) ? (
+          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-gold-400/80 bg-burgundy-600 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-white shadow-[0_4px_14px_-2px_rgba(0,0,0,0.5)]">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-300 motion-reduce:animate-none" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold-300" />
+            </span>
+            New Arrival
+          </span>
         ) : null}
         {soundEnabled ? (
           <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">
