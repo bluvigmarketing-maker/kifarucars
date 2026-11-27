@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_ITEMS } from "@/components/admin/Sidebar";
+import { NAV_GROUPS } from "@/components/admin/Sidebar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
 
@@ -11,7 +11,9 @@ export function MobileNav() {
 
   return (
     <nav className="flex items-center gap-1 overflow-x-auto border-b border-charcoal-100 bg-white px-3 py-2 lg:hidden dark:border-charcoal-800 dark:bg-charcoal-950">
-      {NAV_ITEMS.map(({ label, href, Icon }) => {
+      {NAV_GROUPS.flatMap((group) =>
+        group.items.map((item) => ({ ...item, label: group.title === "Kifaru Liquor" ? `Liquor ${item.label.toLowerCase()}` : item.label }))
+      ).map(({ label, href, Icon }) => {
         const active = href === "/kifaruadmin" ? pathname === href : pathname.startsWith(href);
         return (
           <Link

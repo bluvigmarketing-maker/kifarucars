@@ -151,3 +151,14 @@ export async function uploadVehicleHoverSound(
   }
   return uploadPublicFile("vehicle-audio", "vehicles", file);
 }
+
+/** Uploads a Kifaru Liquor product photo to the public `liquor-images` bucket (staff only). */
+export async function uploadLiquorImage(file: File): Promise<{ url: string } | { error: string }> {
+  if (![...ALLOWED_IMAGE_TYPES, "image/avif"].includes(file.type)) {
+    return { error: "Photo must be a JPG, PNG, WEBP or AVIF file." };
+  }
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    return { error: "Photo must be 8MB or smaller." };
+  }
+  return uploadPublicFile("liquor-images", "products", file);
+}
