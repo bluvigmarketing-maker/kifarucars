@@ -125,7 +125,10 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
             aria-modal="true"
             aria-labelledby="new-arrival-title"
             aria-describedby="new-arrival-desc"
-            className="relative w-full max-w-[460px] overflow-hidden rounded-3xl border-2 border-gold-400/70 bg-charcoal-950 text-white shadow-[0_0_60px_-10px_rgba(201,162,39,0.55)]"
+            // Never taller than the screen: the photo stage is capped and the
+            // text area scrolls if needed. On short landscape screens
+            // (phones sideways) photo and text sit side by side instead.
+            className="relative flex max-h-[calc(100dvh-2rem)] w-full max-w-[460px] flex-col overflow-hidden rounded-3xl border-2 [@media(max-height:500px)]:max-w-[760px] [@media(max-height:500px)]:flex-row border-gold-400/70 bg-charcoal-950 text-white shadow-[0_0_60px_-10px_rgba(201,162,39,0.55)]"
             initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.85, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 20 }}
@@ -142,7 +145,7 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
             </button>
 
             {/* Stage: spotlight, spinning rays and speed streaks behind the car. */}
-            <div className="relative aspect-[5/4] overflow-hidden bg-[radial-gradient(ellipse_at_center,_#64162b_0%,_#250710_55%,_#0d0c0b_100%)]">
+            <div className="relative aspect-[5/4] w-full shrink-0 overflow-hidden [@media(min-height:501px)]:max-h-[42dvh] [@media(min-height:501px)_and_(max-height:700px)]:max-h-[34dvh] [@media(max-height:500px)]:aspect-auto [@media(max-height:500px)]:w-[45%] bg-[radial-gradient(ellipse_at_center,_#64162b_0%,_#250710_55%,_#0d0c0b_100%)]">
               {!reduceMotion ? (
                 <motion.div
                   aria-hidden="true"
@@ -200,7 +203,7 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
               {/* NEW stamp slams down on top of the car. */}
               <motion.div
                 aria-hidden="true"
-                className="absolute left-[5%] top-[5%] z-10"
+                className="absolute left-[5%] top-[5%] z-10 origin-top-left [@media(max-height:640px)]:scale-75"
                 initial={reduceMotion ? { opacity: 0 } : { scale: 3.2, rotate: -40, opacity: 0 }}
                 animate={{ scale: 1, rotate: -14, opacity: 1 }}
                 transition={
@@ -226,7 +229,9 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
               </motion.div>
             </div>
 
-            <div className="px-6 pb-6 pt-5 text-center">
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-6 pb-6 pt-5 text-center [@media(max-height:640px)]:px-5 [@media(max-height:640px)]:pb-4 [@media(max-height:640px)]:pt-3 [@media(max-height:500px)]:pr-14!">
+              {/* my-auto centres the text when there's room and falls back to top-aligned scrolling when there isn't. */}
+              <div className="my-auto">
               <motion.p
                 className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-400"
                 initial={{ opacity: 0, y: 10 }}
@@ -237,7 +242,7 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
               </motion.p>
               <motion.h2
                 id="new-arrival-title"
-                className="mt-2 font-display text-[1.7rem] leading-tight sm:text-3xl"
+                className="mt-2 font-display text-[1.7rem] leading-tight sm:text-3xl [@media(max-height:640px)]:mt-1 [@media(max-height:640px)]:text-2xl"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: t(1.25), duration: 0.4 }}
@@ -246,7 +251,7 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
               </motion.h2>
               <motion.p
                 id="new-arrival-desc"
-                className="mt-2 text-sm text-charcoal-300"
+                className="mt-2 text-sm text-charcoal-300 [@media(max-height:700px)]:hidden"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: t(1.35), duration: 0.4 }}
@@ -255,7 +260,7 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
               </motion.p>
 
               <motion.div
-                className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2"
+                className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 [@media(max-height:640px)]:mt-2"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: t(1.45), duration: 0.35 }}
@@ -277,7 +282,7 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
               </motion.div>
 
               <motion.div
-                className="mt-5 flex flex-col gap-2.5 sm:flex-row"
+                className="mt-5 flex flex-col gap-2.5 sm:flex-row [@media(max-height:640px)]:mt-3 [@media(max-height:640px)]:gap-2"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: t(1.55), duration: 0.35 }}
@@ -285,18 +290,19 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
                 <Link
                   href={`/fleet/${vehicle.id}#book`}
                   onClick={close}
-                  className="inline-flex flex-1 items-center justify-center rounded-full border-2 border-gold-400/70 bg-burgundy-600 px-5 py-3 text-sm font-medium text-white shadow-[0_0_14px_-3px_rgba(201,162,39,0.55)] transition-colors hover:bg-burgundy-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
+                  className="inline-flex flex-1 items-center justify-center rounded-full border-2 border-gold-400/70 bg-burgundy-600 px-5 py-3 text-sm font-medium [@media(max-height:640px)]:py-2.5 text-white shadow-[0_0_14px_-3px_rgba(201,162,39,0.55)] transition-colors hover:bg-burgundy-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
                 >
                   Book it now
                 </Link>
                 <Link
                   href={`/fleet/${vehicle.id}`}
                   onClick={close}
-                  className="inline-flex flex-1 items-center justify-center rounded-full border-2 border-gold-400/60 px-5 py-3 text-sm font-medium text-white transition-colors hover:border-burgundy-400 hover:text-burgundy-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
+                  className="inline-flex flex-1 items-center justify-center rounded-full border-2 border-gold-400/60 px-5 py-3 text-sm font-medium [@media(max-height:640px)]:py-2.5 text-white transition-colors hover:border-burgundy-400 hover:text-burgundy-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
                 >
                   See all photos
                 </Link>
               </motion.div>
+              </div>
             </div>
           </motion.div>
         </motion.div>
