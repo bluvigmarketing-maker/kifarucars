@@ -180,13 +180,24 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
                 animate={{ x: 0, rotate: -2, skewX: 0, filter: "blur(0px)", opacity: 1 }}
                 transition={reduceMotion ? { duration: 0.3 } : { ...landingSpring, delay: 0.25 }}
               >
+                {/* Blurred copy fills any space around the photo, so the frame's
+                    shape can change with the screen without cropping the car. */}
+                <Image
+                  src={vehicle.imageUrl}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(max-width: 500px) 90vw, 420px"
+                  className="scale-110 object-cover opacity-60 blur-xl"
+                />
+                {/* The car itself: object-contain, so the whole photo is always visible. */}
                 <Image
                   src={vehicle.imageUrl}
                   alt={vehicle.title}
                   fill
                   priority
                   sizes="(max-width: 500px) 90vw, 420px"
-                  className="object-cover"
+                  className="object-contain"
                 />
                 {/* Shine sweep once it lands. */}
                 {!reduceMotion ? (
@@ -203,7 +214,7 @@ export function NewArrivalPopup({ vehicle }: { vehicle: NewArrival }) {
               {/* NEW stamp slams down on top of the car. */}
               <motion.div
                 aria-hidden="true"
-                className="absolute left-[5%] top-[5%] z-10 origin-top-left [@media(max-height:640px)]:scale-75"
+                className="absolute left-[2%] top-[2%] z-10 origin-top-left scale-90 [@media(max-height:640px)]:scale-[0.7]"
                 initial={reduceMotion ? { opacity: 0 } : { scale: 3.2, rotate: -40, opacity: 0 }}
                 animate={{ scale: 1, rotate: -14, opacity: 1 }}
                 transition={
